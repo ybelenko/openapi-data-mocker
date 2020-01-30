@@ -1,0 +1,17 @@
+{
+    "name": "ybelenko/openapi-data-mocker",
+    "description": "Library that generates fake data from Swagger 2.0|Openapi 3.0 spec",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["openapi", "swagger", "data", "mocker", "faker", "mock", "fake"],
+    "authors": [
+        {
+            "name": "Yuriy Belenko",
+            "email": "yura-bely@mail.ru"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.1"
+    }
+}
