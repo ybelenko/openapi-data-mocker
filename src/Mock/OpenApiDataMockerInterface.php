@@ -229,4 +229,15 @@ interface OpenApiDataMockerInterface
         $additionalProperties = null,
         $required = null
     );
+
+    /**
+     * Mocks OpenApi Data from schema.
+     *
+     * @param array|object $schema OpenAPI schema
+     *
+     * @throws \InvalidArgumentException when invalid arguments passed
+     *
+     * @return mixed
+     */
+    public function mockFromSchema($schema);
 }
