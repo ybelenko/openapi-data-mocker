@@ -240,4 +240,16 @@ interface OpenApiDataMockerInterface
      * @return mixed
      */
     public function mockFromSchema($schema);
+
+    /**
+     * Mock data by referenced schema.
+     * TODO: this method will return model instance, not an StdClass
+     *
+     * @param string|null $ref Ref to model, eg. #/components/schemas/User
+     *
+     * @throws \InvalidArgumentException when invalid arguments passed
+     *
+     * @return mixed
+     */
+    public function mockFromRef($ref);
 }
