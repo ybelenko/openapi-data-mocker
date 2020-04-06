@@ -26,6 +26,7 @@
 namespace OpenAPIServer\Mock;
 
 use OpenAPIServer\Mock\OpenApiDataMockerInterface as IMocker;
+use OpenAPIServer\Utils\ModelUtilsTrait;
 use StdClass;
 use InvalidArgumentException;
 
@@ -38,6 +39,8 @@ use InvalidArgumentException;
  */
 final class OpenApiDataMocker implements IMocker
 {
+    use ModelUtilsTrait;
+
     /**
      * Mocks OpenApi Data.
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#data-types
@@ -268,11 +271,26 @@ final class OpenApiDataMocker implements IMocker
         $options = $this->extractSchemaProperties($items);
         $dataType = $options['type'];
         $dataFormat = $options['format'] ?? null;
+        $ref = $options['$ref'] ?? null;
 
-        // always genarate smallest possible array to avoid huge JSON responses
+        // always generate smallest possible array to avoid huge JSON responses
         $arrSize = ($maxSize < 1) ? $maxSize : max($minSize, 1);
         while (count($arr) < $arrSize) {
-            $arr[] = $this->mock($dataType, $dataFormat, $options);
+            if (is_string($ref) && !empty($ref)) {
+                $refName = static::getSimpleRef($ref);
+                $modelName = static::toModelName($refName);
+                $modelClass = 'OpenAPIServer\\Mock\\TestModels\\' . $modelName;
+                if (!class_exists($modelClass) || !method_exists($modelClass, 'getOpenApiSchema')) {
+                    throw new InvalidArgumentException(sprintf(
+                        'Model %s not found or method %s doesn\'t exist',
+                        $modelClass,
+                        $modelClass . '::getOpenApiSchema'
+                    ));
+                }
+                $arr[] = $this->mockFromSchema($modelClass::getOpenApiSchema());
+            } else {
+                $arr[] = $this->mock($dataType, $dataFormat, $options);
+            }
         }
         return $arr;
     }
@@ -412,6 +430,7 @@ final class OpenApiDataMocker implements IMocker
                 'additionalProperties',
                 'required',
                 'example',
+                '$ref',
             ] as $propName
         ) {
             if (is_array($val) && array_key_exists($propName, $val)) {
