@@ -1,0 +1,20 @@
+language: php
+dist: trusty
+php:
+  - 7.1
+  - 7.2
+
+install:
+  - composer install --dev --no-interaction
+script:
+  - mkdir -p report/logs
+  - php vendor/bin/phpunit -c phpunit.xml.dist
+  - php vendor/bin/phpcs --standard=phpcs.xml.dist
+
+before_script:
+  - composer require --dev php-coveralls/php-coveralls --no-interaction
+
+after_success:
+  - travis_retry php vendor/bin/php-coveralls
+  # or enable logging
+  - travis_retry php vendor/bin/php-coveralls -v
