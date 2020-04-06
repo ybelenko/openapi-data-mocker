@@ -1,5 +1,10 @@
 # Openapi Data Mocker
 
+[![Latest Stable Version](https://poser.pugx.org/ybelenko/openapi-data-mocker/v/stable)](https://packagist.org/packages/ybelenko/openapi-data-mocker)
+[![Build Status](https://travis-ci.com/ybelenko/openapi-data-mocker.svg?branch=master)](https://travis-ci.com/ybelenko/openapi-data-mocker)
+[![Coverage Status](https://coveralls.io/repos/github/ybelenko/openapi-data-mocker/badge.svg?branch=master)](https://coveralls.io/github/ybelenko/openapi-data-mocker?branch=master)
+[![License](https://poser.pugx.org/ybelenko/openapi-data-mocker/license)](https://packagist.org/packages/ybelenko/openapi-data-mocker)
+
 Openapi Data Mocker helps to generate fake data from OpenAPI 3.0 documents. Most of the methods may work with 2.0 version(fka Swagger 2.0), but it's not tested. This package was an enhancement of PHP Slim4 server in [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) project, but it easier to maintain it in separated repo.
 
 ## Requirements
