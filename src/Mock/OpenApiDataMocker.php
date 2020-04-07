@@ -42,6 +42,9 @@ final class OpenApiDataMocker implements IMocker
 {
     use ModelUtilsTrait;
 
+    /** @var string|null Model classes namespace */
+    protected $modelsNamespace;
+
     /**
      * Mocks OpenApi Data.
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#data-types
@@ -502,7 +505,7 @@ final class OpenApiDataMocker implements IMocker
         if (is_string($ref) && !empty($ref)) {
             $refName = static::getSimpleRef($ref);
             $modelName = static::toModelName($refName);
-            $modelClass = 'OpenAPIServer\\Mock\\TestModels\\' . $modelName;
+            $modelClass = $this->getModelsNamespace() . $modelName;
             if (!class_exists($modelClass) || !method_exists($modelClass, 'getOpenApiSchema')) {
                 throw new InvalidArgumentException(sprintf(
                     'Model %s not found or method %s doesn\'t exist',
@@ -620,5 +623,31 @@ final class OpenApiDataMocker implements IMocker
             return round($min + mt_rand() / mt_getrandmax() * ($max - $min), $maxDecimals);
         }
         return mt_rand((int) $min, (int) $max);
+    }
+
+    /**
+     * Sets models namespace for handling $ref links.
+     *
+     * @param string|null $namespace Namespace of model classes eg. JohnDoesPackage\\Model\\
+     *
+     * @throws \InvalidArgumentException when namespace not a string or null
+     */
+    public function setModelsNamespace($namespace = null)
+    {
+        if ($namespace !== null && !is_string($namespace)) {
+            throw new InvalidArgumentException('"namespace" must be a string or null');
+        }
+
+        $this->modelsNamespace = $namespace;
+    }
+
+    /**
+     * Gets models namespace.
+     *
+     * @return string|null
+     */
+    public function getModelsNamespace()
+    {
+        return $this->modelsNamespace;
     }
 }
