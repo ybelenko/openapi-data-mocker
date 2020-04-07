@@ -8,7 +8,7 @@ install:
   - composer install --dev --no-interaction
 script:
   - mkdir -p report/logs
-  - php vendor/bin/phpunit -c phpunit.xml.dist
+  - php vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=report/logs/clover.xml
   - php vendor/bin/phpcs --standard=phpcs.xml.dist
 
 before_script:

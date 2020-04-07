@@ -23,9 +23,6 @@
             <directory suffix=".php">src/</directory>
         </whitelist>
     </filter>
-    <logging>
-        <log type="coverage-clover" target="report/logs/clover.xml"/>
-    </logging>
     <php>
         <ini name="error_reporting" value="E_ALL" />
     </php>
