@@ -252,4 +252,20 @@ interface OpenApiDataMockerInterface
      * @return mixed
      */
     public function mockFromRef($ref);
+
+    /**
+     * Sets models namespace for handling $ref links.
+     *
+     * @param string|null $namespace Namespace of model classes eg. JohnDoesPackage\\Model\\
+     *
+     * @throws \InvalidArgumentException when namespace not a string or null
+     */
+    public function setModelsNamespace($namespace = null);
+
+    /**
+     * Gets models namespace.
+     *
+     * @return string|null
+     */
+    public function getModelsNamespace();
 }
