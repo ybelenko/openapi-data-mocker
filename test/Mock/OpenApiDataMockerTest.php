@@ -1212,6 +1212,45 @@ class OpenApiDataMockerTest extends TestCase
             'ref to class without getOpenApiSchema method' => ['#/components/schemas/ClassWithoutGetSchemaMethod'],
         ];
     }
+
+    /**
+     * @covers ::setModelsNamespace
+     * @covers ::getModelsNamespace
+     */
+    public function testSetModelsNamespaceSetterAndGetterWithCorrectArguments()
+    {
+        $mocker = new OpenApiDataMocker();
+        $this->assertNull($mocker->getModelsNamespace());
+        $mocker->setModelsNamespace('JohnDoesPackage\\Model\\');
+        $this->assertSame('JohnDoesPackage\\Model\\', $mocker->getModelsNamespace());
+        // reset namespace
+        $mocker->setModelsNamespace();
+        $this->assertNull($mocker->getModelsNamespace());
+    }
+
+    /**
+     * @dataProvider provideSetModelsNamespaceInvalidArguments
+     * @expectedException \InvalidArgumentException
+     * @covers ::setModelsNamespace
+     * @covers ::getModelsNamespace
+     */
+    public function testSetModelsNamespaceSetterAndGetterWithIncorrectArguments($namespace)
+    {
+        $mocker = new OpenApiDataMocker();
+        $mocker->setModelsNamespace($namespace);
+    }
+
+    public function provideSetModelsNamespaceInvalidArguments()
+    {
+        return [
+            'number' => [355],
+            'float' => [3.14],
+            'bool' => [false],
+            'array' => [[]],
+            'DateTime' => [new DateTime()],
+            'StdClass' => [new StdClass()],
+        ];
+    }
 }
 
 namespace JohnDoesPackage\TestModels;
