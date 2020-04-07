@@ -24,6 +24,8 @@ require __DIR__ . '/vendor/autoload.php';
 
 use OpenAPIServer\Mock\OpenApiDataMocker as Mocker;
 $mocker = new Mocker();
+// set model classes namespace for $ref handling
+$mocker->setModelsNamespace('JohnDoesPackage\\Model\\');
 $data = [
     'Integer from 1 to 100' => $mocker->mockInteger(null, 1, 100),
     'Float from -3 to 3' =>  $mocker->mockNumber(null, -3, 3),
