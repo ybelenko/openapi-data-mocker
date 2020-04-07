@@ -882,6 +882,7 @@ class OpenApiDataMockerTest extends TestCase
     public function testMockArrayWithRef($items, $expectedStructure)
     {
         $mocker = new OpenApiDataMocker();
+        $mocker->setModelsNamespace('JohnDoesPackage\\TestModels\\');
         $arr = $mocker->mockArray($items);
         $this->assertIsArray($arr);
         $this->assertCount(1, $arr);
@@ -1037,6 +1038,7 @@ class OpenApiDataMockerTest extends TestCase
     public function testMockObjectWithReferencedProps()
     {
         $mocker = new OpenApiDataMocker();
+        $mocker->setModelsNamespace('JohnDoesPackage\\TestModels\\');
         $obj = $mocker->mockObject(
             (object) [
                 'cat' => [
@@ -1057,6 +1059,7 @@ class OpenApiDataMockerTest extends TestCase
     public function testMockFromSchemaWithCorrectArguments($schema, $expectedType)
     {
         $mocker = new OpenApiDataMocker();
+        $mocker->setModelsNamespace('JohnDoesPackage\\TestModels\\');
         $data = $mocker->mockFromSchema($schema);
         $this->assertInternalType($expectedType, $data);
     }
@@ -1170,6 +1173,7 @@ class OpenApiDataMockerTest extends TestCase
     public function testMockFromRefWithCorrectArguments($ref, $expectedStructure)
     {
         $mocker = new OpenApiDataMocker();
+        $mocker->setModelsNamespace('JohnDoesPackage\\TestModels\\');
         $data = $mocker->mockFromRef($ref);
         foreach ($expectedStructure as $expectedProp => $expectedType) {
             $this->assertInternalType($expectedType, $data->$expectedProp);
@@ -1210,7 +1214,7 @@ class OpenApiDataMockerTest extends TestCase
     }
 }
 
-namespace OpenAPIServer\Mock\TestModels;
+namespace JohnDoesPackage\TestModels;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
 final class CatRefTestClass
