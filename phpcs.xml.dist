@@ -2,9 +2,6 @@
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="OpenapiDataMocker package" xsi:noNamespaceSchemaLocation="phpcs.xsd">
     <description>Coding standard for OpenapiDataMocker package</description>
 
-    <!-- Path to inspected files -->
-    <file>./</file>
-
     <!-- Don't need to inspect installed packages -->
     <exclude-pattern>./vendor</exclude-pattern>
 
@@ -25,10 +22,9 @@
     <rule ref="PSR12">
         <!-- There is no way to wrap generated comments, just disable that rule for now -->
         <exclude name="Generic.Files.LineLength.TooLong" />
-        <!-- Codegen generates variables with underscore on purpose -->
-        <exclude name="PSR2.Classes.PropertyDeclaration.Underscore" />
     </rule>
 
     <!-- Paths to check -->
     <file>src</file>
+    <file>test</file>
 </ruleset>
