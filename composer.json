@@ -12,7 +12,8 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.1"
+        "php": "^7.1",
+        "ybelenko/openapi-data-mocker-interfaces": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0 || ^7.0",
@@ -35,5 +36,12 @@
         ],
         "phpunit": "phpunit --coverage-text",
         "phpcs": "phpcs"
-    }
+    },
+    "repositories": [
+        {
+            "url": "https://github.com/ybelenko/openapi-data-mocker-interfaces.git",
+            "type": "github",
+            "no-api": true
+        }
+    ]
 }
