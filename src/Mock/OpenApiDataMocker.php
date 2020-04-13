@@ -506,12 +506,10 @@ final class OpenApiDataMocker implements IMocker
             $refName = static::getSimpleRef($ref);
             $modelName = static::toModelName($refName);
             $modelClass = $this->getModelsNamespace() . $modelName;
-            if (!class_exists($modelClass) || !method_exists($modelClass, 'getOpenApiSchema')) {
-                throw new InvalidArgumentException(sprintf(
-                    'Model %s not found or method %s doesn\'t exist',
-                    $modelClass,
-                    $modelClass . '::getOpenApiSchema'
-                ));
+            if (!class_exists($modelClass)) {
+                throw new InvalidArgumentException(sprintf('Model %s not found', $modelClass));
+            } elseif (!method_exists($modelClass, 'getOpenApiSchema')) {
+                throw new InvalidArgumentException(sprintf('Method %s doesn\'t exist', $modelClass . '::getOpenApiSchema'));
             }
             $data = $this->mockFromSchema($modelClass::getOpenApiSchema(true));
         }
