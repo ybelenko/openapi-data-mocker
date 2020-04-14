@@ -882,7 +882,7 @@ class OpenApiDataMockerTest extends TestCase
     public function testMockArrayWithRef($items, $expectedStructure)
     {
         $mocker = new OpenApiDataMocker();
-        $mocker->setModelsNamespace('JohnDoesPackage\\TestModels\\');
+        $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $arr = $mocker->mockArray($items);
         $this->assertIsArray($arr);
         $this->assertCount(1, $arr);
@@ -1038,7 +1038,7 @@ class OpenApiDataMockerTest extends TestCase
     public function testMockObjectWithReferencedProps()
     {
         $mocker = new OpenApiDataMocker();
-        $mocker->setModelsNamespace('JohnDoesPackage\\TestModels\\');
+        $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $obj = $mocker->mockObject(
             (object) [
                 'cat' => [
@@ -1059,7 +1059,7 @@ class OpenApiDataMockerTest extends TestCase
     public function testMockFromSchemaWithCorrectArguments($schema, $expectedType)
     {
         $mocker = new OpenApiDataMocker();
-        $mocker->setModelsNamespace('JohnDoesPackage\\TestModels\\');
+        $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $data = $mocker->mockFromSchema($schema);
         $this->assertInternalType($expectedType, $data);
     }
@@ -1173,7 +1173,7 @@ class OpenApiDataMockerTest extends TestCase
     public function testMockFromRefWithCorrectArguments($ref, $expectedStructure)
     {
         $mocker = new OpenApiDataMocker();
-        $mocker->setModelsNamespace('JohnDoesPackage\\TestModels\\');
+        $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $data = $mocker->mockFromRef($ref);
         foreach ($expectedStructure as $expectedProp => $expectedType) {
             $this->assertInternalType($expectedType, $data->$expectedProp);
@@ -1202,6 +1202,7 @@ class OpenApiDataMockerTest extends TestCase
     public function testMockFromRefWithInvalidArguments($ref)
     {
         $mocker = new OpenApiDataMocker();
+        $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $data = $mocker->mockFromRef($ref);
     }
 
@@ -1251,41 +1252,4 @@ class OpenApiDataMockerTest extends TestCase
             'StdClass' => [new StdClass()],
         ];
     }
-}
-
-namespace JohnDoesPackage\TestModels;
-
-// phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
-final class CatRefTestClass
-{
-    private const MODEL_SCHEMA = <<<'SCHEMA'
-{
-    "required" : [ "className" ],
-    "type" : "object",
-    "properties" : {
-        "className" : {
-            "type" : "string"
-        },
-        "color" : {
-            "type" : "string",
-            "default" : "red"
-        },
-        "declawed" : {
-            "type" : "boolean"
-        }
-    },
-    "discriminator" : {
-        "propertyName" : "className"
-    }
-}
-SCHEMA;
-
-    public static function getOpenApiSchema()
-    {
-        return json_decode(static::MODEL_SCHEMA, true);
-    }
-}
-
-final class ClassWithoutGetSchemaMethod
-{
 }
