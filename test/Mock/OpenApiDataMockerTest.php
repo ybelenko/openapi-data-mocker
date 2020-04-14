@@ -842,7 +842,7 @@ class OpenApiDataMockerTest extends TestCase
             'items is nor array' => [
                 'foobar', null, null, false,
             ],
-            'items doesnt have "type" key' => [
+            'items doesn\'t have "type" key' => [
                 ['foobar' => 'foobaz'], null, null, false,
             ],
             'minItems is not integer' => [

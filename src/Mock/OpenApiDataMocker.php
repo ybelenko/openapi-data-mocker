@@ -258,7 +258,7 @@ final class OpenApiDataMocker implements IMocker
                     $str = base64_encode($getLoremIpsum($inputLength));
                 }
 
-                // base64 encoding produces strings devided by 4, so resulted string can exceed maxLength parameter
+                // base64 encoding produces strings divided by 4, so resulted string can exceed maxLength parameter
                 // I think truncated(invalid) base64 string is better than oversized, cause this data is fake anyway
                 $str = $truncateOrPad($str, null, $maxLength, '. ');
                 break;
