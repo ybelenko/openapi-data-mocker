@@ -26,6 +26,7 @@
 namespace OpenAPIServer\Mock;
 
 use OpenAPIServer\Mock\OpenApiDataMockerInterface as IMocker;
+use OpenAPIServer\Mock\OpenApiModelInterface;
 use OpenAPIServer\Utils\ModelUtilsTrait;
 use StdClass;
 use DateTime;
@@ -493,11 +494,10 @@ final class OpenApiDataMocker implements IMocker
 
     /**
      * Mock data by referenced schema.
-     * TODO: this method will return model instance, not an StdClass
      *
      * @param string|null $ref Ref to model, eg. #/components/schemas/User
      *
-     * @return mixed
+     * @return OpenApiModelInterface
      */
     public function mockFromRef($ref)
     {
@@ -511,7 +511,8 @@ final class OpenApiDataMocker implements IMocker
             } elseif (!method_exists($modelClass, 'getOpenApiSchema')) {
                 throw new InvalidArgumentException(sprintf('Method %s doesn\'t exist', $modelClass . '::getOpenApiSchema'));
             }
-            $data = $this->mockFromSchema($modelClass::getOpenApiSchema(true));
+            $data = $this->mockFromSchema($modelClass::getOpenApiSchema());
+            $data = $modelClass::createFromData($data);
         }
 
         return $data;

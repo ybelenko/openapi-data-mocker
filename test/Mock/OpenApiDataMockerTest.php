@@ -887,8 +887,7 @@ class OpenApiDataMockerTest extends TestCase
         $this->assertIsArray($arr);
         $this->assertCount(1, $arr);
         foreach ($arr as $item) {
-            // TODO: replace with assertInstanceOf assertion
-            $this->assertInternalType(IsType::TYPE_OBJECT, $item);
+            $this->assertInstanceOf('OpenAPIServer\\Mock\\Model\\CatRefTestClass', $item);
             foreach ($expectedStructure as $expectedProp => $expectedType) {
                 $this->assertInternalType($expectedType, $item->$expectedProp);
             }
