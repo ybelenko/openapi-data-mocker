@@ -65,8 +65,8 @@ SCHEMA;
      */
     public function __set($param, $value)
     {
-        $schema = static::getOpenApiSchema();
-        $definedProps = (property_exists($schema, 'properties')) ? $schema->properties : null;
+        $schema = (array) static::getOpenApiSchema();
+        $definedProps = (array_key_exists('properties', $schema)) ? $schema['properties'] : null;
         if (
             is_array($definedProps)
             && in_array($param, array_keys($definedProps))
@@ -98,9 +98,17 @@ SCHEMA;
      */
     public function __get($param)
     {
-        $schema = static::getOpenApiSchema();
-        $definedProps = (property_exists($schema, 'properties')) ? $schema->properties : [];
-        if (property_exists($definedProps, $param)) {
+        $schema = (array) static::getOpenApiSchema();
+        $definedProps = (array_key_exists('properties', $schema)) ? $schema['properties'] : null;
+        if (
+            is_array($definedProps)
+            && in_array($param, array_keys($definedProps))
+        ) {
+            return $this->dataContainer[$param];
+        } elseif (
+            is_object($definedProps)
+            && property_exists($definedProps, $param)
+        ) {
             return $this->dataContainer[$param];
         }
 
@@ -118,12 +126,12 @@ SCHEMA;
     public function jsonSerialize()
     {
         $obj = new StdClass();
-        $schema = static::getOpenApiSchema();
-        $definedProps = (property_exists($schema, 'properties')) ? $schema->properties : [];
+        $schema = (array) static::getOpenApiSchema();
+        $definedProps = (array_key_exists('properties', $schema)) ? $schema['properties'] : null;
         foreach ($definedProps as $propName => $propSchema) {
             if (array_key_exists($propName, $this->dataContainer)) {
                 $obj->{$propName} = $this->dataContainer[$propName];
-            } elseif (property_exists($schema, 'required') && in_array($propName, $schema->required)) {
+            } elseif (array_key_exists('required', $schema) && in_array($propName, $schema['required'])) {
                 // property is required but not set
                 $obj->{$propName} = null;
             }

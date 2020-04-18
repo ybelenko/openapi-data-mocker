@@ -5,6 +5,7 @@ namespace OpenAPIServer\Mock;
 use PHPUnit\Framework\TestCase;
 use OpenAPIServer\Mock\BaseModel;
 use OpenAPIServer\Mock\Model\CatRefTestClass;
+use OpenAPIServer\Mock\Model\DogRefTestClass;
 use OpenAPIServer\Mock\OpenApiModelInterface;
 use InvalidArgumentException;
 
@@ -18,26 +19,53 @@ class BaseModelTest extends TestCase
      */
     public function testGetOpenApiSchema()
     {
-        $schema = BaseModel::getOpenApiSchema();
-        $this->assertTrue(is_array($schema) || is_object($schema));
+        foreach (
+            [
+                BaseModel::getOpenApiSchema(),
+                CatRefTestClass::getOpenApiSchema(),
+                DogRefTestClass::getOpenApiSchema(),
+            ] as $schema
+        ) {
+            $this->assertTrue(is_array($schema) || is_object($schema));
+        }
     }
 
     /**
      * @covers ::createFromData
+     * @covers ::__set
      * @covers ::__get
+     * @dataProvider provideCreateFromDataArguments
      */
-    public function testCreateFromData()
+    public function testCreateFromData($modelClass, $data)
     {
-        $item = CatRefTestClass::createFromData([
-            'className' => 'cheshire',
-            'color' => 'black',
-            'declawed' => false,
-        ]);
-        $this->assertInstanceOf(CatRefTestClass::class, $item);
+        $item = $modelClass::createFromData($data);
+        $this->assertInstanceOf($modelClass, $item);
         $this->assertInstanceOf(OpenApiModelInterface::class, $item);
-        $this->assertSame('cheshire', $item->className);
-        $this->assertSame('black', $item->color);
-        $this->assertSame(false, $item->declawed);
+        foreach ($data as $propName => $propValue) {
+            $this->assertSame($propValue, $item->{$propName});
+        }
+    }
+
+    public function provideCreateFromDataArguments()
+    {
+        return [
+            'CatRefTestClass' => [
+                CatRefTestClass::class,
+                [
+                    'className' => 'cheshire',
+                    'color' => 'gray',
+                    'declawed' => true,
+                ],
+            ],
+            'DogRefTestClass' => [
+                DogRefTestClass::class,
+                [
+                    'className' => 'bulldog',
+                    'color' => 'black',
+                    'declawed' => false,
+                ],
+            ],
+        ];
     }
 
     /**
@@ -120,6 +148,19 @@ class BaseModelTest extends TestCase
                 json_encode([
                     'className' => null,
                     'color' => 'black',
+                ]),
+            ],
+            'model with schema serialized as assoc array' => [
+                DogRefTestClass::class,
+                [
+                    'className' => 'bulldog',
+                    'color' => 'gray',
+                    'declawed' => false,
+                ],
+                json_encode([
+                    'className' => 'bulldog',
+                    'color' => 'gray',
+                    'declawed' => false,
                 ]),
             ],
         ];
