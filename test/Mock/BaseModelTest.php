@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use OpenAPIServer\Mock\BaseModel;
 use OpenAPIServer\Mock\Model\CatRefTestClass;
 use OpenAPIServer\Mock\OpenApiModelInterface;
+use InvalidArgumentException;
 
 /**
  * @coversDefaultClass \OpenAPIServer\Mock\BaseModel
@@ -52,6 +53,28 @@ class BaseModelTest extends TestCase
         $this->assertSame('cheshire', $item->className);
         $this->assertSame('black', $item->color);
         $this->assertSame(false, $item->declawed);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Cannot set unknownProp property of OpenAPIServer\Mock\Model\CatRefTestClass model because it doesn't exist in related OAS schema
+     * @covers ::__set
+     */
+    public function testSetterWithUnknownProp()
+    {
+        $item = new CatRefTestClass();
+        $item->unknownProp = 'foobar';
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Cannot get unknownProp property of OpenAPIServer\Mock\Model\CatRefTestClass model because it doesn't exist in related OAS schema
+     * @covers ::__get
+     */
+    public function testGetterWithUnknownProp()
+    {
+        $item = new CatRefTestClass();
+        $unknownProp = $item->unknownProp;
     }
 
     /**
