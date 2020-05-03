@@ -74,9 +74,9 @@ trait StringUtilsTrait
             $original = $matches[2][0];
             $upperCase = strtoupper($original);
             if ($original === $upperCase) {
-                $word = preg_replace($p, '$2', $word);
+                $word = preg_replace($p, '$2', $word, 1);
             } else {
-                $word = preg_replace($p, $upperCase, $word);
+                $word = preg_replace($p, $upperCase, $word, 1);
             }
         }
 
@@ -84,7 +84,7 @@ trait StringUtilsTrait
         $p = '/(-)(.)/';
         while (preg_match($p, $word, $matches) === 1) {
             $upperCase = strtoupper($matches[2][0]);
-            $word = preg_replace($p, $upperCase, $word);
+            $word = preg_replace($p, $upperCase, $word, 1);
         }
 
         if ($lowercaseFirstLetter === true && strlen($word) > 0) {

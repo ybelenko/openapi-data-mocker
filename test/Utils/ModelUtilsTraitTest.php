@@ -68,6 +68,9 @@ class ModelUtilsTraitTest extends TestCase
             'number as argument' => [
                 156, null,
             ],
+            'inline response 200' => [
+                '#/components/schemas/inline_response_200', 'inline_response_200',
+            ],
         ];
     }
 
@@ -97,6 +100,7 @@ class ModelUtilsTraitTest extends TestCase
             ['abcd', 'WithStart', 'AndEnd', 'WithStartAbcdAndEnd'],
             ['_foobar_Objects', null, null, 'FoobarObjects'],
             [null, null, null, null],
+            ['inline_response_200', null, null, 'InlineResponse200'],
         ];
     }
 }

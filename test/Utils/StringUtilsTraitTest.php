@@ -67,6 +67,9 @@ class StringUtilsTraitTest extends TestCase
 
             ['123', true, '123'],
             ['$123', true, '$123'],
+            ['_foobar_Objects', null, 'FoobarObjects'],
+            ['_foobar_Objects_small_Big', null, 'FoobarObjectsSmallBig'],
+            ['inline_response_200', null, 'InlineResponse200'],
         ];
     }
 
