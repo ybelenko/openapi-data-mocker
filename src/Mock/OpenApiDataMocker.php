@@ -39,7 +39,7 @@ use InvalidArgumentException;
  * @author  OpenAPI Generator team
  * @link    https://github.com/openapitools/openapi-generator
  */
-final class OpenApiDataMocker implements IMocker
+class OpenApiDataMocker implements IMocker
 {
     use ModelUtilsTrait;
 
