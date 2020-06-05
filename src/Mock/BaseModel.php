@@ -3,6 +3,7 @@
 namespace OpenAPIServer\Mock;
 
 use OpenAPIServer\Mock\OpenApiModelInterface;
+use OpenAPIServer\Mock\OpenApiDataMockerInterface as IMocker;
 use InvalidArgumentException;
 use StdClass;
 
@@ -20,12 +21,49 @@ class BaseModel implements OpenApiModelInterface
     }
 SCHEMA;
 
+    /** @var string[] Valid OAS data types */
+    protected const VALID_OAS_DATA_TYPES = [
+        IMocker::DATA_TYPE_INTEGER,
+        IMocker::DATA_TYPE_NUMBER,
+        IMocker::DATA_TYPE_STRING,
+        IMocker::DATA_TYPE_BOOLEAN,
+        IMocker::DATA_TYPE_ARRAY,
+        IMocker::DATA_TYPE_OBJECT,
+    ];
+
     /**
-     * @var array Data container.
+     * @var mixed Data container.
      * PHP has restrictions on variable names, while OAS is much more permissive.
      * This container helps to store unusual properties like '123_prop' without renaming.
      */
-    protected $dataContainer = [];
+    protected $dataContainer;
+
+    /**
+     * Model constructor.
+     *
+     * @throws \InvalidArgumentException when OAS schema type is invalid
+     */
+    public function __construct()
+    {
+        $schema = (array) static::getOpenApiSchema();
+        $modelType = (array_key_exists('type', $schema)) ? $schema['type'] : null;
+        $this->validateModelType($modelType, true);
+
+        // set initial data
+        switch ($modelType) {
+            case IMocker::DATA_TYPE_OBJECT:
+            case IMocker::DATA_TYPE_ARRAY:
+                $this->dataContainer = [];
+                break;
+            case IMocker::DATA_TYPE_INTEGER:
+            case IMocker::DATA_TYPE_NUMBER:
+            case IMocker::DATA_TYPE_STRING:
+            case IMocker::DATA_TYPE_BOOLEAN:
+            default:
+                // scalar type
+                $this->dataContainer = null;
+        }
+    }
 
     /**
      * Gets OAS 3.0 schema mapped to current class.
@@ -47,11 +85,91 @@ SCHEMA;
     public static function createFromData($data): OpenApiModelInterface
     {
         $instance = new static();
-        foreach ($data as $key => $value) {
-            // this action handles __set method
-            $instance->{$key} = $value;
-        }
+        $instance->setData($data);
         return $instance;
+    }
+
+    /**
+     * Sets instance data.
+     *
+     * @param mixed $data Data with values for new instance.
+     *
+     * @throws \InvalidArgumentException when value for array type is invalid
+     */
+    public function setData($data)
+    {
+        $schema = (array) static::getOpenApiSchema();
+        switch ($schema['type']) {
+            case IMocker::DATA_TYPE_ARRAY:
+                // data for array OAS type should be straight indexed array
+                if (is_array($data)) {
+                    $arr = [];
+                    for ($i = 0; $i < count($data); $i++) {
+                        if (isset($data[$i])) {
+                            $arr[$i] = $data[$i];
+                        }
+                    }
+
+                    if (count($arr) === count($data)) {
+                        $this->dataContainer = $arr;
+                        return;
+                    }
+                }
+
+                throw new InvalidArgumentException(
+                    sprintf('Invalid data for %s model because it accepts straight indexed arrays only', static::class)
+                );
+                break;
+            case IMocker::DATA_TYPE_OBJECT:
+                foreach ($data as $key => $value) {
+                    // this action handles __set method
+                    $this->{$key} = $value;
+                }
+                break;
+            case IMocker::DATA_TYPE_INTEGER:
+            case IMocker::DATA_TYPE_NUMBER:
+            case IMocker::DATA_TYPE_STRING:
+            case IMocker::DATA_TYPE_BOOLEAN:
+            default:
+                $this->dataContainer = $data;
+                break;
+        }
+    }
+
+    /**
+     * Returns instance data.
+     *
+     * @return mixed
+     */
+    public function getData()
+    {
+        $data = null;
+        $schema = (array) static::getOpenApiSchema();
+        switch ($schema['type']) {
+            case IMocker::DATA_TYPE_OBJECT:
+                // need to convert data container to object
+                $data = new StdClass();
+                $definedProps = (array_key_exists('properties', $schema)) ? $schema['properties'] : null;
+                if (is_array($definedProps) || is_object($definedProps)) {
+                    foreach ($definedProps as $propName => $propSchema) {
+                        if (array_key_exists($propName, $this->dataContainer)) {
+                            $data->{$propName} = $this->dataContainer[$propName];
+                        } elseif (array_key_exists('required', $schema) && in_array($propName, $schema['required'])) {
+                            // property is required but not set
+                            $data->{$propName} = null;
+                        }
+                    }
+                }
+                break;
+            case IMocker::DATA_TYPE_INTEGER:
+            case IMocker::DATA_TYPE_NUMBER:
+            case IMocker::DATA_TYPE_STRING:
+            case IMocker::DATA_TYPE_BOOLEAN:
+            case IMocker::DATA_TYPE_ARRAY:
+            default:
+                $data = $this->dataContainer;
+        }
+        return $data;
     }
 
     /**
@@ -66,24 +184,28 @@ SCHEMA;
     public function __set($param, $value)
     {
         $schema = (array) static::getOpenApiSchema();
-        $definedProps = (array_key_exists('properties', $schema)) ? $schema['properties'] : null;
-        if (
-            is_array($definedProps)
-            && in_array($param, array_keys($definedProps))
-        ) {
-            $this->dataContainer[$param] = $value;
-            return;
-        } elseif (
-            is_object($definedProps)
-            && property_exists($definedProps, $param)
-        ) {
-            $this->dataContainer[$param] = $value;
-            return;
+        $modelType = (array_key_exists('type', $schema)) ? $schema['type'] : null;
+        switch ($modelType) {
+            case IMocker::DATA_TYPE_OBJECT:
+                $definedProps = (array_key_exists('properties', $schema)) ? (array) $schema['properties'] : null;
+                if (is_array($definedProps) && !in_array($param, array_keys($definedProps))) {
+                    throw new InvalidArgumentException(
+                        sprintf('Cannot set %s property of %s model because it doesn\'t exist in related OAS schema', $param, static::class)
+                    );
+                }
+                $this->dataContainer[$param] = $value;
+                break;
+            case IMocker::DATA_TYPE_INTEGER:
+            case IMocker::DATA_TYPE_NUMBER:
+            case IMocker::DATA_TYPE_STRING:
+            case IMocker::DATA_TYPE_BOOLEAN:
+            case IMocker::DATA_TYPE_ARRAY:
+            default:
+                // scalar type and array cannot use property assignation
+                throw new InvalidArgumentException(
+                    sprintf('Cannot set %s property of %s model because it\'s %s type. Use setData method instead', $param, static::class, $modelType)
+                );
         }
-
-        throw new InvalidArgumentException(
-            sprintf('Cannot set %s property of %s model because it doesn\'t exist in related OAS schema', $param, static::class)
-        );
     }
 
     /**
@@ -99,17 +221,23 @@ SCHEMA;
     public function __get($param)
     {
         $schema = (array) static::getOpenApiSchema();
-        $definedProps = (array_key_exists('properties', $schema)) ? $schema['properties'] : null;
+        $modelType = (array_key_exists('type', $schema)) ? $schema['type'] : null;
+        $definedProps = (array_key_exists('properties', $schema)) ? (array) $schema['properties'] : null;
+        if (!in_array($modelType, [null, IMocker::DATA_TYPE_OBJECT])) {
+            // scalar type
+            throw new InvalidArgumentException(
+                sprintf('Cannot get %s property of %s model because getter is for object OAS type only', $param, static::class)
+            );
+        }
+
         if (
             is_array($definedProps)
             && in_array($param, array_keys($definedProps))
         ) {
             return $this->dataContainer[$param];
-        } elseif (
-            is_object($definedProps)
-            && property_exists($definedProps, $param)
-        ) {
-            return $this->dataContainer[$param];
+        } elseif ($definedProps === null) {
+            // props are undefined
+            return (isset($this->dataContainer[$param])) ? $this->dataContainer[$param] : null;
         }
 
         throw new InvalidArgumentException(
@@ -125,17 +253,31 @@ SCHEMA;
      */
     public function jsonSerialize()
     {
-        $obj = new StdClass();
-        $schema = (array) static::getOpenApiSchema();
-        $definedProps = (array_key_exists('properties', $schema)) ? $schema['properties'] : null;
-        foreach ($definedProps as $propName => $propSchema) {
-            if (array_key_exists($propName, $this->dataContainer)) {
-                $obj->{$propName} = $this->dataContainer[$propName];
-            } elseif (array_key_exists('required', $schema) && in_array($propName, $schema['required'])) {
-                // property is required but not set
-                $obj->{$propName} = null;
-            }
+        return $this->getData();
+    }
+
+    /**
+     * Checks if type is valid OAS data type.
+     *
+     * @param string|null $type           Model type
+     * @param bool        $throwException Throws InvalidArgumentException when set to true and processed type is invalid
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return bool
+     */
+    protected function validateModelType($type = null, $throwException = true)
+    {
+        $isValid = in_array($type, static::VALID_OAS_DATA_TYPES);
+        if ($isValid === false && $throwException) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Invalid OAS schema of %s model, "type" must be one of %s',
+                    static::class,
+                    implode(', ', static::VALID_OAS_DATA_TYPES)
+                )
+            );
         }
-        return $obj;
+        return $isValid;
     }
 }
