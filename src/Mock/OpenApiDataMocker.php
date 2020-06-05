@@ -30,14 +30,13 @@ class OpenApiDataMocker implements IMocker
     protected $modelsNamespace;
 
     /**
-     * Mocks OpenApi Data.
-     * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#data-types
+     * Mocks OpenApi Data. @link https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#data-types
      *
-     * @param $dataType   string     OpenApi data type. Use constants from OpenApiDataMockerInterface class
-     * @param $dataFormat string     (optional) OpenApi data format
-     * @param $options    array|null (optional) OpenApi data options
+     * @param string     $dataType   OpenApi data type. Use constants from this class.
+     * @param string     $dataFormat OpenApi data format.
+     * @param array|null $options    OpenApi data options.
      *
-     * @throws \InvalidArgumentException when invalid arguments passed
+     * @throws \InvalidArgumentException When invalid arguments passed.
      *
      * @return mixed
      */
@@ -90,13 +89,13 @@ class OpenApiDataMocker implements IMocker
      * Shortcut to mock integer type
      * Equivalent to mockData(DATA_TYPE_INTEGER);
      *
-     * @param string|null $dataFormat       (optional) int32 or int64
-     * @param number|null $minimum          (optional) Default is 0
-     * @param number|null $maximum          (optional) Default is mt_getrandmax()
-     * @param bool|null   $exclusiveMinimum (optional) Default is false
-     * @param bool|null   $exclusiveMaximum (optional) Default is false
+     * @param string|null $dataFormat       Possible values: int32 or int64.
+     * @param float|null  $minimum          Default is 0.
+     * @param float|null  $maximum          Default is mt_getrandmax().
+     * @param bool|null   $exclusiveMinimum Default is false.
+     * @param bool|null   $exclusiveMaximum Default is false.
      *
-     * @throws \InvalidArgumentException when $maximum less than $minimum or invalid arguments provided
+     * @throws \InvalidArgumentException When $maximum less than $minimum or invalid arguments provided.
      *
      * @return int
      */
@@ -130,13 +129,13 @@ class OpenApiDataMocker implements IMocker
      * Shortcut to mock number type
      * Equivalent to mockData(DATA_TYPE_NUMBER);
      *
-     * @param string|null $dataFormat       (optional) float or double
-     * @param number|null $minimum          (optional) Default is 0
-     * @param number|null $maximum          (optional) Default is mt_getrandmax()
-     * @param bool|null   $exclusiveMinimum (optional) Default is false
-     * @param bool|null   $exclusiveMaximum (optional) Default is false
+     * @param string|null $dataFormat       Possible values: float or double.
+     * @param float|null  $minimum          Default is 0.
+     * @param float|null  $maximum          Default is mt_getrandmax().
+     * @param bool|null   $exclusiveMinimum Default is false.
+     * @param bool|null   $exclusiveMaximum Default is false.
      *
-     * @throws \InvalidArgumentException when $maximum less than $minimum or invalid arguments provided
+     * @throws \InvalidArgumentException When $maximum less than $minimum or invalid arguments provided.
      *
      * @return float
      */
@@ -154,15 +153,15 @@ class OpenApiDataMocker implements IMocker
      * Shortcut to mock string type
      * Equivalent to mockData(DATA_TYPE_STRING);
      *
-     * @param string|null $dataFormat (optional) one of byte, binary, date, date-time, password
-     * @param int|null    $minLength  (optional) Default is 0
-     * @param int|null    $maxLength  (optional) Default is 100 chars
-     * @param array       $enum       (optional) This array should have at least one element.
-     * Elements in the array should be unique.
-     * @param string|null $pattern    (optional) This string should be a valid regular expression, according to the ECMA 262 regular expression dialect.
-     * Recall: regular expressions are not implicitly anchored.
+     * @param string|null $dataFormat Possible values: byte, binary, date, date-time, password.
+     * @param int|null    $minLength  Default is 0.
+     * @param int|null    $maxLength  Default is 100 chars.
+     * @param array       $enum       This array should have at least one element.
+     *                                Elements in the array should be unique.
+     * @param string|null $pattern    This string should be a valid regular expression, according to the ECMA 262 regular expression dialect.
+     *                                Recall: regular expressions are not implicitly anchored.
      *
-     * @throws \InvalidArgumentException when invalid arguments passed
+     * @throws \InvalidArgumentException When invalid arguments passed.
      *
      * @return string
      */
@@ -314,12 +313,12 @@ class OpenApiDataMocker implements IMocker
      * Shortcut to mock array type
      * Equivalent to mockData(DATA_TYPE_ARRAY);
      *
-     * @param object|array $items       Object or assoc array of described items
-     * @param int|null     $minItems    (optional) An array instance is valid against "minItems" if its size is greater than, or equal to, the value of this keyword.
-     * @param int|null     $maxItems    (optional) An array instance is valid against "maxItems" if its size is less than, or equal to, the value of this keyword
-     * @param bool|null    $uniqueItems (optional) If it has boolean value true, the instance validates successfully if all of its elements are unique
+     * @param array     $items       Assoc array of described items.
+     * @param int|null  $minItems    An array instance is valid against "minItems" if its size is greater than, or equal to, the value of this keyword.
+     * @param int|null  $maxItems    An array instance is valid against "maxItems" if its size is less than, or equal to, the value of this keyword.
+     * @param bool|null $uniqueItems If it has boolean value true, the instance validates successfully if all of its elements are unique.
      *
-     * @throws \InvalidArgumentException when invalid arguments passed
+     * @throws \InvalidArgumentException When invalid arguments passed.
      *
      * @return array
      */
@@ -376,16 +375,16 @@ class OpenApiDataMocker implements IMocker
      * Shortcut to mock object type.
      * Equivalent to mockData(DATA_TYPE_OBJECT);
      *
-     * @param object|array           $properties           Object or array of described properties
-     * @param int|null               $minProperties        (optional) An object instance is valid against "minProperties" if its number of properties is greater than, or equal to, the value of this keyword.
-     * @param int|null               $maxProperties        (optional) An object instance is valid against "maxProperties" if its number of properties is less than, or equal to, the value of this keyword.
-     * @param bool|object|array|null $additionalProperties (optional) If "additionalProperties" is true, validation always succeeds.
-     * If "additionalProperties" is false, validation succeeds only if the instance is an object and all properties on the instance were covered by "properties" and/or "patternProperties".
-     * If "additionalProperties" is an object, validate the value as a schema to all of the properties that weren't validated by "properties" nor "patternProperties".
-     * @param array|null             $required             (optional) This array MUST have at least one element.  Elements of this array must be strings, and MUST be unique.
-     * An object instance is valid if its property set contains all elements in this array value.
+     * @param array                  $properties           Assoc array of described properties.
+     * @param int|null               $minProperties        An object instance is valid against "minProperties" if its number of properties is greater than, or equal to, the value of this keyword.
+     * @param int|null               $maxProperties        An object instance is valid against "maxProperties" if its number of properties is less than, or equal to, the value of this keyword.
+     * @param bool|object|array|null $additionalProperties If "additionalProperties" is true, validation always succeeds.
+     *                                                     If "additionalProperties" is false, validation succeeds only if the instance is an object and all properties on the instance were covered by "properties" and/or "patternProperties".
+     *                                                     If "additionalProperties" is an object, validate the value as a schema to all of the properties that weren't validated by "properties" nor "patternProperties".
+     * @param array|null             $required             This array MUST have at least one element.  Elements of this array must be strings, and MUST be unique.
+     *                                                     An object instance is valid if its property set contains all elements in this array value.
      *
-     * @throws \InvalidArgumentException when invalid arguments passed
+     * @throws \InvalidArgumentException When invalid arguments passed.
      *
      * @return object
      */
@@ -458,9 +457,9 @@ class OpenApiDataMocker implements IMocker
     /**
      * Mocks OpenApi Data from schema.
      *
-     * @param array|object $schema OpenAPI schema
+     * @param array $schema OpenAPI schema.
      *
-     * @throws \InvalidArgumentException when invalid arguments passed
+     * @throws \InvalidArgumentException When invalid arguments passed.
      *
      * @return mixed
      */

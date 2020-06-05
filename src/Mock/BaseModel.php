@@ -81,7 +81,7 @@ SCHEMA;
     /**
      * Gets OAS 3.0 schema mapped to current class.
      *
-     * @return array|object
+     * @return array
      */
     public static function getOpenApiSchema()
     {
