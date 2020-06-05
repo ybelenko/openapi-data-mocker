@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Openapi Data Mocker
+ * PHP version 7.1
+ *
+ * @package OpenAPIServer\Mock
+ * @link    https://github.com/ybelenko/openapi-data-mocker
+ * @author  Yuriy Belenko <yura-bely@mail.ru>
+ * @license MIT
+ */
+
 namespace OpenAPIServer\Mock;
 
 use PHPUnit\Framework\TestCase;
@@ -19,6 +29,8 @@ use InvalidArgumentException;
 use StdClass;
 
 /**
+ * BaseModelTest
+ *
  * @coversDefaultClass \OpenAPIServer\Mock\BaseModel
  */
 class BaseModelTest extends TestCase

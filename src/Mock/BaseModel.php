@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Openapi Data Mocker
+ * PHP version 7.1
+ *
+ * @package OpenAPIServer\Mock
+ * @link    https://github.com/ybelenko/openapi-data-mocker
+ * @author  Yuriy Belenko <yura-bely@mail.ru>
+ * @license MIT
+ */
+
 namespace OpenAPIServer\Mock;
 
 use OpenAPIServer\Mock\OpenApiModelInterface;
@@ -7,6 +17,9 @@ use OpenAPIServer\Mock\OpenApiDataMockerInterface as IMocker;
 use InvalidArgumentException;
 use StdClass;
 
+/**
+ * BaseModel
+ */
 class BaseModel implements OpenApiModelInterface
 {
     /**
