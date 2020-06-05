@@ -8,7 +8,7 @@
 Openapi Data Mocker helps to generate fake data from OpenAPI 3.0 documents. Most of the methods may work with 2.0 version(fka Swagger 2.0), but it's not tested. This package was an enhancement of PHP Slim4 server in [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) project, but it easier to maintain it in separated repo.
 
 ## Requirements
-- PHP ^7.1
+- PHP ^7.2
 
 ## Installation via Composer
 
