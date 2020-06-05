@@ -8,6 +8,9 @@
     <!-- <basepath>     A path to strip from the front of file paths inside reports -->
     <arg name="basepath" value="."/>
 
+    <!-- do not lint css and js files -->
+    <arg name="extensions" value="php,inc"/>
+
     <!-- colors              Use colors in output -->
     <arg name="colors"/>
 
