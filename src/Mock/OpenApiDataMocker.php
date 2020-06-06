@@ -10,6 +10,8 @@
  * @license MIT
  */
 
+declare(strict_types=1);
+
 namespace OpenAPIServer\Mock;
 
 use OpenAPIServer\Mock\OpenApiDataMockerInterface as IMocker;
@@ -40,7 +42,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @return mixed
      */
-    public function mock($dataType, $dataFormat = null, $options = [])
+    public function mock(string $dataType, ?string $dataFormat = null, ?array $options = [])
     {
         switch ($dataType) {
             case IMocker::DATA_TYPE_INTEGER:
@@ -100,12 +102,12 @@ class OpenApiDataMocker implements IMocker
      * @return int
      */
     public function mockInteger(
-        $dataFormat = null,
-        $minimum = null,
-        $maximum = null,
-        $exclusiveMinimum = false,
-        $exclusiveMaximum = false
-    ) {
+        ?string $dataFormat = null,
+        ?float $minimum = null,
+        ?float $maximum = null,
+        ?bool $exclusiveMinimum = false,
+        ?bool $exclusiveMaximum = false
+    ): int {
         $dataFormat = is_string($dataFormat) ? strtolower($dataFormat) : $dataFormat;
         switch ($dataFormat) {
             case IMocker::DATA_FORMAT_INT32:
@@ -140,12 +142,12 @@ class OpenApiDataMocker implements IMocker
      * @return float
      */
     public function mockNumber(
-        $dataFormat = null,
-        $minimum = null,
-        $maximum = null,
-        $exclusiveMinimum = false,
-        $exclusiveMaximum = false
-    ) {
+        ?string $dataFormat = null,
+        ?float $minimum = null,
+        ?float $maximum = null,
+        ?bool $exclusiveMinimum = false,
+        ?bool $exclusiveMaximum = false
+    ): float {
         return $this->getRandomNumber($minimum, $maximum, $exclusiveMinimum, $exclusiveMaximum, 4);
     }
 
@@ -166,12 +168,12 @@ class OpenApiDataMocker implements IMocker
      * @return string
      */
     public function mockString(
-        $dataFormat = null,
-        $minLength = 0,
-        $maxLength = null,
-        $enum = null,
-        $pattern = null
-    ) {
+        ?string $dataFormat = null,
+        ?int $minLength = 0,
+        ?int $maxLength = null,
+        ?array $enum = null,
+        ?string $pattern = null
+    ): string {
         $str = '';
         $getLoremIpsum = function ($length) {
             return str_pad(
@@ -304,7 +306,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @return bool
      */
-    public function mockBoolean()
+    public function mockBoolean(): bool
     {
         return (bool) mt_rand(0, 1);
     }
@@ -323,11 +325,11 @@ class OpenApiDataMocker implements IMocker
      * @return array
      */
     public function mockArray(
-        $items,
-        $minItems = 0,
-        $maxItems = null,
-        $uniqueItems = false
-    ) {
+        array $items,
+        ?int $minItems = 0,
+        ?int $maxItems = null,
+        ?bool $uniqueItems = false
+    ): array {
         $arr = [];
         $minSize = 0;
         $maxSize = \PHP_INT_MAX;
@@ -389,12 +391,12 @@ class OpenApiDataMocker implements IMocker
      * @return object
      */
     public function mockObject(
-        $properties,
-        $minProperties = 0,
-        $maxProperties = null,
+        array $properties,
+        ?int $minProperties = 0,
+        ?int $maxProperties = null,
         $additionalProperties = null,
-        $required = null
-    ) {
+        ?array $required = null
+    ): object {
         $obj = new StdClass();
 
         if (is_object($properties) === false && is_array($properties) === false) {
@@ -463,7 +465,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @return mixed
      */
-    public function mockFromSchema($schema)
+    public function mockFromSchema(array $schema)
     {
         $props = $this->extractSchemaProperties($schema);
         if (array_key_exists('$ref', $props) && !empty($props['$ref'])) {
@@ -481,7 +483,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @return OpenApiModelInterface
      */
-    public function mockFromRef($ref)
+    public function mockFromRef(?string $ref): ?OpenApiModelInterface
     {
         $data = null;
         if (is_string($ref) && !empty($ref)) {
@@ -508,7 +510,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @return array
      */
-    private function extractSchemaProperties($val)
+    private function extractSchemaProperties(array $val): array
     {
         $props = [
             'type' => null,
@@ -555,12 +557,12 @@ class OpenApiDataMocker implements IMocker
      * @return float|int
      */
     protected function getRandomNumber(
-        $minimum = null,
-        $maximum = null,
-        $exclusiveMinimum = false,
-        $exclusiveMaximum = false,
-        $maxDecimals = 4
-    ) {
+        ?float $minimum = null,
+        ?float $maximum = null,
+        ?bool $exclusiveMinimum = false,
+        ?bool $exclusiveMaximum = false,
+        ?int $maxDecimals = 4
+    ): float {
         $min = 0;
         $max = mt_getrandmax();
 
@@ -613,7 +615,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @throws \InvalidArgumentException when namespace not a string or null
      */
-    public function setModelsNamespace($namespace = null)
+    public function setModelsNamespace(?string $namespace = null): void
     {
         if ($namespace !== null && !is_string($namespace)) {
             throw new InvalidArgumentException('"namespace" must be a string or null');
@@ -627,7 +629,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @return string|null
      */
-    public function getModelsNamespace()
+    public function getModelsNamespace(): ?string
     {
         return $this->modelsNamespace;
     }

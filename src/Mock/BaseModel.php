@@ -10,6 +10,8 @@
  * @license MIT
  */
 
+declare(strict_types=1);
+
 namespace OpenAPIServer\Mock;
 
 use OpenAPIServer\Mock\OpenApiModelInterface;
@@ -83,7 +85,7 @@ SCHEMA;
      *
      * @return array
      */
-    public static function getOpenApiSchema()
+    public static function getOpenApiSchema(): array
     {
         return json_decode(static::MODEL_SCHEMA);
     }
@@ -109,7 +111,7 @@ SCHEMA;
      *
      * @throws \InvalidArgumentException when value for array type is invalid
      */
-    public function setData($data)
+    public function setData($data): void
     {
         $schema = (array) static::getOpenApiSchema();
         switch ($schema['type']) {
@@ -194,7 +196,7 @@ SCHEMA;
      *
      * @throws \InvalidArgumentException when property doesn't exist in related OAS schema
      */
-    public function __set($param, $value)
+    public function __set(string $param, $value): void
     {
         $schema = (array) static::getOpenApiSchema();
         $modelType = (array_key_exists('type', $schema)) ? $schema['type'] : null;
@@ -231,7 +233,7 @@ SCHEMA;
      *
      * @return mixed Property value
      */
-    public function __get($param)
+    public function __get(string $param)
     {
         $schema = (array) static::getOpenApiSchema();
         $modelType = (array_key_exists('type', $schema)) ? $schema['type'] : null;
@@ -279,7 +281,7 @@ SCHEMA;
      *
      * @return bool
      */
-    protected function validateModelType($type = null, $throwException = true)
+    protected function validateModelType(?string $type = null, bool $throwException = true): bool
     {
         $isValid = in_array($type, static::VALID_OAS_DATA_TYPES);
         if ($isValid === false && $throwException) {

@@ -10,6 +10,8 @@
  * @license MIT
  */
 
+declare(strict_types=1);
+
 namespace OpenAPIServer\Utils;
 
 use OpenAPIServer\Utils\StringUtilsTrait;
@@ -33,7 +35,7 @@ trait ModelUtilsTrait
      *
      * @return string|null classname or null on fail
      */
-    public static function getSimpleRef($ref)
+    public static function getSimpleRef(string $ref): ?string
     {
         $model = null;
         if (stripos($ref, '#/components/') === 0) {
@@ -59,10 +61,10 @@ trait ModelUtilsTrait
      * @return string capitalized model name
      */
     public static function toModelName(
-        $name,
-        $modelNamePrefix = null,
-        $modelNameSuffix = null
-    ) {
+        string $name,
+        ?string $modelNamePrefix = null,
+        ?string $modelNameSuffix = null
+    ): ?string {
         if (is_string($name) === false  || empty($name)) {
             return null;
         }

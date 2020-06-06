@@ -10,6 +10,8 @@
  * @license MIT
  */
 
+declare(strict_types=1);
+
 namespace OpenAPIServer\Utils;
 
 /**
@@ -28,7 +30,7 @@ trait StringUtilsTrait
      *
      * @return string camelized string
      */
-    public static function camelize($word, $lowercaseFirstLetter = false)
+    public static function camelize(string $word, ?bool $lowercaseFirstLetter = false): string
     {
         // Replace all slashes with dots (package separator)
         $p = '/\/(.?)/';
@@ -102,7 +104,7 @@ trait StringUtilsTrait
      *
      * @return bool
      */
-    public static function isReservedWord($word)
+    public static function isReservedWord(string $word): bool
     {
         if (is_string($word) === false) {
             return false;
