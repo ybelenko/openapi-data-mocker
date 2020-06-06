@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Constraint\IsType;
 use StdClass;
 use DateTime;
+use InvalidArgumentException;
 
 /**
  * OpenApiDataMockerTest
@@ -30,43 +31,43 @@ class OpenApiDataMockerTest extends TestCase
      * @covers ::mock
      * @dataProvider provideMockCorrectArguments
      */
-    public function testMockCorrectArguments($dataType, $dataFormat, $options, $expectedType)
+    public function testMockCorrectArguments($dataType, $dataFormat, $options, $assertMethod)
     {
         $mocker = new OpenApiDataMocker();
         $data = $mocker->mock($dataType, $dataFormat, $options);
-        $this->assertInternalType($expectedType, $data);
+        $this->$assertMethod($data);
     }
 
     public function provideMockCorrectArguments()
     {
         return [
-            [IMocker::DATA_TYPE_INTEGER, null, null, IsType::TYPE_INT],
-            [IMocker::DATA_TYPE_NUMBER, null, null, IsType::TYPE_FLOAT],
-            [IMocker::DATA_TYPE_STRING, null, null, IsType::TYPE_STRING],
-            [IMocker::DATA_TYPE_BOOLEAN, null, null, IsType::TYPE_BOOL],
+            [IMocker::DATA_TYPE_INTEGER, null, null, 'assertIsInt'],
+            [IMocker::DATA_TYPE_NUMBER, null, null, 'assertIsFloat'],
+            [IMocker::DATA_TYPE_STRING, null, null, 'assertIsString'],
+            [IMocker::DATA_TYPE_BOOLEAN, null, null, 'assertIsBool'],
             [IMocker::DATA_TYPE_ARRAY, null, [
                 'items' => [
                     'type' => IMocker::DATA_TYPE_INTEGER,
                 ],
-            ], IsType::TYPE_ARRAY],
+            ], 'assertIsArray'],
             [IMocker::DATA_TYPE_OBJECT, null, [
                 'properties' => [
                     'username' => [
                         'type' => IMocker::DATA_TYPE_INTEGER,
                     ],
                 ],
-            ], IsType::TYPE_OBJECT],
+            ], 'assertIsObject'],
         ];
     }
 
     /**
      * @covers ::mock
      * @dataProvider provideMockInvalidArguments
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "dataType" must be one of integer, number, string, boolean, array, object
      */
     public function testMockInvalidArguments($dataType, $dataFormat, $options)
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"dataType" must be one of integer, number, string, boolean, array, object');
         $mocker = new OpenApiDataMocker();
         $data = $mocker->mock($dataType, $dataFormat, $options);
     }
@@ -101,8 +102,7 @@ class OpenApiDataMockerTest extends TestCase
         $maximum = null,
         $exclusiveMinimum = false,
         $exclusiveMaximum = false,
-        $matchingInternalTypes = [],
-        $notMatchingInternalTypes = []
+        $typeAssertionMethods = []
     ) {
         $mocker = new OpenApiDataMocker();
         $integer = $mocker->mockInteger($dataFormat, $minimum, $maximum, $exclusiveMinimum, $exclusiveMaximum);
@@ -113,43 +113,39 @@ class OpenApiDataMockerTest extends TestCase
             $maximum,
             $exclusiveMinimum,
             $exclusiveMaximum,
-            $matchingInternalTypes,
-            $notMatchingInternalTypes
+            $typeAssertionMethods
         );
     }
 
     public function provideMockIntegerCorrectArguments()
     {
-        $types = [
-            IsType::TYPE_INT,
-            IsType::TYPE_NUMERIC,
-            IsType::TYPE_SCALAR,
-        ];
-        $notTypes = [
-            IsType::TYPE_ARRAY,
-            IsType::TYPE_BOOL,
-            IsType::TYPE_FLOAT,
-            IsType::TYPE_NULL,
-            IsType::TYPE_OBJECT,
-            IsType::TYPE_RESOURCE,
-            IsType::TYPE_STRING,
-            IsType::TYPE_CALLABLE,
+        $typeAssertionMethods = [
+            'assertIsInt',
+            'assertIsNumeric',
+            'assertIsScalar',
+            'assertIsNotArray',
+            'assertIsNotBool',
+            'assertIsNotFloat',
+            'assertNotNull',
+            'assertIsNotObject',
+            'assertIsNotResource',
+            'assertIsNotString',
+            'assertIsNotCallable',
         ];
 
         return [
-            [null, -100, 100, false, false, $types, $notTypes],
-            [null, -100, null, false, false, $types, $notTypes],
-            [null, null, 100, false, false, $types, $notTypes],
-            [null, -99.5, null, true, false, $types, $notTypes],
-            [null, null, 99.5, false, true, $types, $notTypes],
-            [null, -99.5, 99.5, true, true, $types, $notTypes],
+            [null, -100, 100, false, false, $typeAssertionMethods],
+            [null, -100, null, false, false, $typeAssertionMethods],
+            [null, null, 100, false, false, $typeAssertionMethods],
+            [null, -99.5, null, true, false, $typeAssertionMethods],
+            [null, null, 99.5, false, true, $typeAssertionMethods],
+            [null, -99.5, 99.5, true, true, $typeAssertionMethods],
         ];
     }
 
     /**
      * @dataProvider provideMockIntegerInvalidArguments
      * @covers ::mockInteger
-     * @expectedException \InvalidArgumentException
      */
     public function testMockIntegerWithInvalidArguments(
         $dataFormat = null,
@@ -158,6 +154,7 @@ class OpenApiDataMockerTest extends TestCase
         $exclusiveMinimum = false,
         $exclusiveMaximum = false
     ) {
+        $this->expectException(InvalidArgumentException::class);
         $mocker = new OpenApiDataMocker();
         $integer = $mocker->mockInteger($dataFormat, $minimum, $maximum, $exclusiveMinimum, $exclusiveMaximum);
     }
@@ -210,8 +207,7 @@ class OpenApiDataMockerTest extends TestCase
         $maximum = null,
         $exclusiveMinimum = false,
         $exclusiveMaximum = false,
-        $matchingInternalTypes = [],
-        $notMatchingInternalTypes = []
+        $typeAssertionMethods = []
     ) {
         $mocker = new OpenApiDataMocker();
         $number = $mocker->mockNumber($dataFormat, $minimum, $maximum, $exclusiveMinimum, $exclusiveMaximum);
@@ -222,42 +218,38 @@ class OpenApiDataMockerTest extends TestCase
             $maximum,
             $exclusiveMinimum,
             $exclusiveMaximum,
-            $matchingInternalTypes,
-            $notMatchingInternalTypes
+            $typeAssertionMethods
         );
     }
 
     public function provideMockNumberCorrectArguments()
     {
-        $types = [
-            IsType::TYPE_SCALAR,
-            IsType::TYPE_NUMERIC,
-            IsType::TYPE_FLOAT,
-        ];
-        $notTypes = [
-            IsType::TYPE_INT,
-            IsType::TYPE_ARRAY,
-            IsType::TYPE_BOOL,
-            IsType::TYPE_NULL,
-            IsType::TYPE_OBJECT,
-            IsType::TYPE_RESOURCE,
-            IsType::TYPE_STRING,
-            IsType::TYPE_CALLABLE,
+        $typeAssertionMethods = [
+            'assertIsScalar',
+            'assertIsNumeric',
+            'assertIsFloat',
+            'assertIsNotInt',
+            'assertIsNotArray',
+            'assertIsNotBool',
+            'assertNotNull',
+            'assertIsNotObject',
+            'assertIsNotResource',
+            'assertIsNotString',
+            'assertIsNotCallable',
         ];
 
         return [
-            [null, -100, 100, false, false, $types, $notTypes],
-            [null, -100, null, false, false, $types, $notTypes],
-            [null, null, 100, false, false, $types, $notTypes],
-            [null, -99.5, null, true, false, $types, $notTypes],
-            [null, null, 99.5, false, true, $types, $notTypes],
-            [null, -99.5, 99.5, true, true, $types, $notTypes],
+            [null, -100, 100, false, false, $typeAssertionMethods],
+            [null, -100, null, false, false, $typeAssertionMethods],
+            [null, null, 100, false, false, $typeAssertionMethods],
+            [null, -99.5, null, true, false, $typeAssertionMethods],
+            [null, null, 99.5, false, true, $typeAssertionMethods],
+            [null, -99.5, 99.5, true, true, $typeAssertionMethods],
         ];
     }
 
     /**
      * @dataProvider provideMockNumberInvalidArguments
-     * @expectedException \InvalidArgumentException
      * @covers ::mockNumber
      */
     public function testMockNumberWithInvalidArguments(
@@ -267,6 +259,7 @@ class OpenApiDataMockerTest extends TestCase
         $exclusiveMinimum = false,
         $exclusiveMaximum = false
     ) {
+        $this->expectException(InvalidArgumentException::class);
         $mocker = new OpenApiDataMocker();
         $number = $mocker->mockNumber($dataFormat, $minimum, $maximum, $exclusiveMinimum, $exclusiveMaximum);
     }
@@ -289,8 +282,7 @@ class OpenApiDataMockerTest extends TestCase
         $minLength = 0,
         $maxLength = null,
         $enum = null,
-        $matchingInternalTypes = [],
-        $notMatchingInternalTypes = []
+        $typeAssertionMethods = []
     ) {
         $mocker = new OpenApiDataMocker();
         $str = $mocker->mockString($dataFormat, $minLength, $maxLength, $enum);
@@ -300,60 +292,56 @@ class OpenApiDataMockerTest extends TestCase
             $minLength,
             $maxLength,
             $enum,
-            $matchingInternalTypes,
-            $notMatchingInternalTypes
+            $typeAssertionMethods
         );
     }
 
     public function provideMockStringCorrectArguments()
     {
-        $types = [
-            IsType::TYPE_SCALAR,
-            IsType::TYPE_STRING,
-        ];
-        $notTypes = [
-            IsType::TYPE_FLOAT,
-            IsType::TYPE_INT,
-            IsType::TYPE_ARRAY,
-            IsType::TYPE_BOOL,
-            IsType::TYPE_NULL,
-            IsType::TYPE_OBJECT,
-            IsType::TYPE_RESOURCE,
-            IsType::TYPE_CALLABLE,
+        $typeAssertionMethods = [
+            'assertIsScalar',
+            'assertIsString',
+            'assertIsNotFloat',
+            'assertIsNotInt',
+            'assertIsNotArray',
+            'assertIsNotBool',
+            'assertNotNull',
+            'assertIsNotObject',
+            'assertIsNotResource',
+            'assertIsNotCallable',
         ];
 
         return [
-            [null, 0, null, null, $types, $notTypes],
-            [null, 10, null, null, $types, $notTypes],
-            [null, 0, 100, null, $types, $notTypes],
-            [null, 10, 50, null, $types, $notTypes],
-            [null, 10, 10, null, $types, $notTypes],
-            [null, 0, 0, null, $types, $notTypes],
-            [null, null, null, null, $types, $notTypes],
-            [null, null, null, ['foobar', 'foobaz', 'hello world'], $types, $notTypes],
-            [null, null, null, ['foobar'], $types, $notTypes],
-            [IMocker::DATA_FORMAT_PASSWORD, 0, null, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_PASSWORD, 10, null, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_PASSWORD, 0, 100, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_PASSWORD, 10, 50, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_PASSWORD, 10, 10, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_PASSWORD, 0, 0, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, null, null, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, 10, null, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, 10, 10, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, null, 8, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, 16, null, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, 25, null, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, 25, 25, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, null, 20, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, 30, null, null, $types, $notTypes],
-            [IMocker::DATA_FORMAT_EMAIL, 1, 1, null, $types, $notTypes],
+            [null, 0, null, null, $typeAssertionMethods],
+            [null, 10, null, null, $typeAssertionMethods],
+            [null, 0, 100, null, $typeAssertionMethods],
+            [null, 10, 50, null, $typeAssertionMethods],
+            [null, 10, 10, null, $typeAssertionMethods],
+            [null, 0, 0, null, $typeAssertionMethods],
+            [null, null, null, null, $typeAssertionMethods],
+            [null, null, null, ['foobar', 'foobaz', 'hello world'], $typeAssertionMethods],
+            [null, null, null, ['foobar'], $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_PASSWORD, 0, null, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_PASSWORD, 10, null, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_PASSWORD, 0, 100, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_PASSWORD, 10, 50, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_PASSWORD, 10, 10, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_PASSWORD, 0, 0, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, null, null, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, 10, null, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, 10, 10, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, null, 8, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, 16, null, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, 25, null, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, 25, 25, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, null, 20, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, 30, null, null, $typeAssertionMethods],
+            [IMocker::DATA_FORMAT_EMAIL, 1, 1, null, $typeAssertionMethods],
         ];
     }
 
     /**
      * @dataProvider provideMockStringInvalidArguments
-     * @expectedException \InvalidArgumentException
      * @covers ::mockString
      */
     public function testMockStringWithInvalidArguments(
@@ -362,6 +350,7 @@ class OpenApiDataMockerTest extends TestCase
         $maxLength = null,
         $enum = null
     ) {
+        $this->expectException(InvalidArgumentException::class);
         $mocker = new OpenApiDataMocker();
         $str = $mocker->mockString($dataFormat, $minLength, $maxLength, $enum);
     }
@@ -392,8 +381,16 @@ class OpenApiDataMockerTest extends TestCase
         $str = $mocker->mockString($dataFormat, $minLength, $maxLength);
         $str2 = $mocker->mock(IMocker::DATA_TYPE_STRING, $dataFormat, ['minLength' => $minLength, 'maxLength' => $maxLength]);
         $base64pattern = '/^[\w\+\/\=]*$/';
-        $this->assertRegExp($base64pattern, $str);
-        $this->assertRegExp($base64pattern, $str2);
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            $this->assertMatchesRegularExpression($base64pattern, $str);
+            $this->assertMatchesRegularExpression($base64pattern, $str2);
+        } elseif (method_exists($this, 'assertRegExp')) {
+            $this->assertRegExp($base64pattern, $str);
+            $this->assertRegExp($base64pattern, $str2);
+        } else {
+            $this->markTestIncomplete('No method to assert RegExp');
+        }
+
         if ($minLength !== null) {
             $this->assertGreaterThanOrEqual($minLength, mb_strlen($str));
             $this->assertGreaterThanOrEqual($minLength, mb_strlen($str2));
@@ -516,8 +513,15 @@ class OpenApiDataMockerTest extends TestCase
             $arr[] = $str;
             $arr2[] = $str2;
 
-            $this->assertRegExp($hexPattern, $str);
-            $this->assertRegExp($hexPattern, $str2);
+            if (method_exists($this, 'assertMatchesRegularExpression')) {
+                $this->assertMatchesRegularExpression($hexPattern, $str);
+                $this->assertMatchesRegularExpression($hexPattern, $str2);
+            } elseif (method_exists($this, 'assertRegExp')) {
+                $this->assertRegExp($hexPattern, $str);
+                $this->assertRegExp($hexPattern, $str2);
+            } else {
+                $this->markTestIncomplete('No method to assert RegExp');
+            }
 
             if ($minLength !== null) {
                 $this->assertGreaterThanOrEqual($minLength, mb_strlen($str));
@@ -556,28 +560,21 @@ class OpenApiDataMockerTest extends TestCase
         $bool = $mocker->mockBoolean();
 
         $matchingInternalTypes = [
-            IsType::TYPE_SCALAR,
-            IsType::TYPE_BOOL,
+            'assertIsScalar',
+            'assertIsBool',
+            'assertIsNotNumeric',
+            'assertIsNotFloat',
+            'assertIsNotInt',
+            'assertIsNotArray',
+            'assertIsNotString',
+            'assertNotNull',
+            'assertIsNotObject',
+            'assertIsNotResource',
+            'assertIsNotCallable',
         ];
 
-        foreach ($matchingInternalTypes as $matchType) {
-            $this->assertInternalType($matchType, $bool);
-        }
-
-        $notMatchingInternalTypes = [
-            IsType::TYPE_NUMERIC,
-            IsType::TYPE_FLOAT,
-            IsType::TYPE_INT,
-            IsType::TYPE_ARRAY,
-            IsType::TYPE_STRING,
-            IsType::TYPE_NULL,
-            IsType::TYPE_OBJECT,
-            IsType::TYPE_RESOURCE,
-            IsType::TYPE_CALLABLE,
-        ];
-
-        foreach ($notMatchingInternalTypes as $notMatchType) {
-            $this->assertNotInternalType($notMatchType, $bool);
+        foreach ($matchingInternalTypes as $assertMethod) {
+            $this->$assertMethod($bool);
         }
     }
 
@@ -587,15 +584,10 @@ class OpenApiDataMockerTest extends TestCase
         $maximum = null,
         $exclusiveMinimum = false,
         $exclusiveMaximum = false,
-        $matchingInternalTypes = [],
-        $notMatchingInternalTypes = []
+        $typeAssertionMethods = []
     ) {
-        foreach ($matchingInternalTypes as $matchType) {
-            $this->assertInternalType($matchType, $number);
-        }
-
-        foreach ($notMatchingInternalTypes as $notMatchType) {
-            $this->assertNotInternalType($notMatchType, $number);
+        foreach ($typeAssertionMethods as $assertMethod) {
+            $this->$assertMethod($number);
         }
 
         if ($minimum !== null) {
@@ -620,15 +612,10 @@ class OpenApiDataMockerTest extends TestCase
         $minLength = null,
         $maxLength = null,
         $enum = null,
-        $matchingInternalTypes = [],
-        $notMatchingInternalTypes = []
+        $typeAssertionMethods = []
     ) {
-        foreach ($matchingInternalTypes as $matchType) {
-            $this->assertInternalType($matchType, $str);
-        }
-
-        foreach ($notMatchingInternalTypes as $notMatchType) {
-            $this->assertNotInternalType($notMatchType, $str);
+        foreach ($typeAssertionMethods as $assertMethod) {
+            $this->$assertMethod($str);
         }
 
         if ($minLength !== null) {
@@ -725,7 +712,7 @@ class OpenApiDataMockerTest extends TestCase
                     $this->internalAssertString($item, $minLength, $maxLength);
                     break;
                 case IMocker::DATA_TYPE_BOOLEAN:
-                    $this->assertInternalType(IsType::TYPE_BOOL, $item);
+                    $this->assertIsBool($item);
                     break;
                 case IMocker::DATA_TYPE_ARRAY:
                     $this->testMockArrayFlattenWithCorrectArguments($subItems, $subMinItems, $subMaxItems, $subUniqueItems);
@@ -794,7 +781,6 @@ class OpenApiDataMockerTest extends TestCase
 
     /**
      * @dataProvider provideMockArrayInvalidArguments
-     * @expectedException \InvalidArgumentException
      * @covers ::mockArray
      */
     public function testMockArrayWithInvalidArguments(
@@ -803,6 +789,7 @@ class OpenApiDataMockerTest extends TestCase
         $maxItems,
         $uniqueItems
     ) {
+        $this->expectException(InvalidArgumentException::class);
         $mocker = new OpenApiDataMocker();
         $arr = $mocker->mockArray($items, $minItems, $maxItems, $uniqueItems);
     }
@@ -843,8 +830,8 @@ class OpenApiDataMockerTest extends TestCase
         $this->assertCount(1, $arr);
         foreach ($arr as $item) {
             $this->assertInstanceOf('OpenAPIServer\\Mock\\Model\\CatRefTestClass', $item);
-            foreach ($expectedStructure as $expectedProp => $expectedType) {
-                $this->assertInternalType($expectedType, $item->$expectedProp);
+            foreach ($expectedStructure as $expectedProp => $assertMethod) {
+                $this->$assertMethod($item->$expectedProp);
             }
         }
     }
@@ -855,9 +842,9 @@ class OpenApiDataMockerTest extends TestCase
             'items with ref to CatRefTestClass' => [
                 ['$ref' => '#/components/schemas/CatRefTestClass'],
                 [
-                    'className' => IsType::TYPE_STRING,
-                    'color' => IsType::TYPE_STRING,
-                    'declawed' => IsType::TYPE_BOOL,
+                    'className' => 'assertIsString',
+                    'color' => 'assertIsString',
+                    'declawed' => 'assertIsBool',
                 ],
             ],
         ];
@@ -884,7 +871,7 @@ class OpenApiDataMockerTest extends TestCase
             $required
         );
 
-        $this->assertInternalType(IsType::TYPE_OBJECT, $obj);
+        $this->assertIsObject($obj);
         $this->assertSame($expectedKeys, array_keys(get_object_vars($obj)));
     }
 
@@ -918,7 +905,6 @@ class OpenApiDataMockerTest extends TestCase
 
     /**
      * @dataProvider provideMockObjectInvalidArguments
-     * @expectedException \InvalidArgumentException
      * @covers ::mockObject
      */
     public function testMockObjectWithInvalidArguments(
@@ -928,6 +914,7 @@ class OpenApiDataMockerTest extends TestCase
         $additionalProperties,
         $required
     ) {
+        $this->expectException(InvalidArgumentException::class);
         $mocker = new OpenApiDataMocker();
         $obj = $mocker->mockObject($properties, $minProperties, $maxProperties, $additionalProperties, $required);
     }
@@ -973,22 +960,22 @@ class OpenApiDataMockerTest extends TestCase
                 ],
             ]
         );
-        $this->assertInternalType(IsType::TYPE_OBJECT, $obj->cat);
-        $this->assertInternalType(IsType::TYPE_STRING, $obj->cat->className);
-        $this->assertInternalType(IsType::TYPE_STRING, $obj->cat->color);
-        $this->assertInternalType(IsType::TYPE_BOOL, $obj->cat->declawed);
+        $this->assertIsObject($obj->cat);
+        $this->assertIsString($obj->cat->className);
+        $this->assertIsString($obj->cat->color);
+        $this->assertIsBool($obj->cat->declawed);
     }
 
     /**
      * @dataProvider provideMockFromSchemaCorrectArguments
      * @covers ::mockFromSchema
      */
-    public function testMockFromSchemaWithCorrectArguments($schema, $expectedType)
+    public function testMockFromSchemaWithCorrectArguments($schema, $assertMethod)
     {
         $mocker = new OpenApiDataMocker();
         $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $data = $mocker->mockFromSchema($schema);
-        $this->assertInternalType($expectedType, $data);
+        $this->$assertMethod($data);
     }
 
     public function provideMockFromSchemaCorrectArguments()
@@ -996,52 +983,52 @@ class OpenApiDataMockerTest extends TestCase
         return [
             'string from array' => [
                 ['type' => IMocker::DATA_TYPE_STRING],
-                IsType::TYPE_STRING,
+                'assertIsString',
             ],
             'integer from array' => [
                 ['type' => IMocker::DATA_TYPE_INTEGER],
-                IsType::TYPE_INT,
+                'assertIsInt',
             ],
             'number from array' => [
                 ['type' => IMocker::DATA_TYPE_NUMBER],
-                IsType::TYPE_FLOAT,
+                'assertIsFloat',
             ],
             'string from array' => [
                 ['type' => IMocker::DATA_TYPE_STRING],
-                IsType::TYPE_STRING,
+                'assertIsString',
             ],
             'boolean from array' => [
                 ['type' => IMocker::DATA_TYPE_BOOLEAN],
-                IsType::TYPE_BOOL,
+                'assertIsBool',
             ],
             'array of strings from array' => [
                 [
                     'type' => IMocker::DATA_TYPE_ARRAY,
                     'items' => ['type' => IMocker::DATA_TYPE_STRING],
                 ],
-                IsType::TYPE_ARRAY,
+                'assertIsArray',
             ],
             'object with username prop from array' => [
                 [
                     'type' => IMocker::DATA_TYPE_OBJECT,
                     'properties' => ['username' => ['type' => IMocker::DATA_TYPE_STRING]],
                 ],
-                IsType::TYPE_OBJECT,
+                'assertIsObject',
             ],
             'referenced class' => [
                 ['$ref' => '#/components/schemas/CatRefTestClass'],
-                IsType::TYPE_OBJECT,
+                'assertIsObject',
             ],
         ];
     }
 
     /**
      * @dataProvider provideMockFromSchemaInvalidArguments
-     * @expectedException \InvalidArgumentException
      * @covers ::mockFromSchema
      */
     public function testMockFromSchemaWithInvalidArguments($schema)
     {
+        $this->expectException(InvalidArgumentException::class);
         $mocker = new OpenApiDataMocker();
         $data = $mocker->mockFromSchema($schema);
     }
@@ -1063,8 +1050,8 @@ class OpenApiDataMockerTest extends TestCase
         $mocker = new OpenApiDataMocker();
         $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $data = $mocker->mockFromRef($ref);
-        foreach ($expectedStructure as $expectedProp => $expectedType) {
-            $this->assertInternalType($expectedType, $data->$expectedProp);
+        foreach ($expectedStructure as $expectedProp => $assertMethod) {
+            $this->$assertMethod($data->$expectedProp);
         }
     }
 
@@ -1074,9 +1061,9 @@ class OpenApiDataMockerTest extends TestCase
             'CatRefTestClass model' => [
                 '#/components/schemas/CatRefTestClass',
                 [
-                    'className' => IsType::TYPE_STRING,
-                    'color' => IsType::TYPE_STRING,
-                    'declawed' => IsType::TYPE_BOOL,
+                    'className' => 'assertIsString',
+                    'color' => 'assertIsString',
+                    'declawed' => 'assertIsBool',
                 ]
             ],
         ];
@@ -1084,11 +1071,11 @@ class OpenApiDataMockerTest extends TestCase
 
     /**
      * @dataProvider provideMockFromRefInvalidArguments
-     * @expectedException \InvalidArgumentException
      * @covers ::mockFromRef
      */
     public function testMockFromRefWithInvalidArguments($ref)
     {
+        $this->expectException(InvalidArgumentException::class);
         $mocker = new OpenApiDataMocker();
         $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $data = $mocker->mockFromRef($ref);

@@ -63,10 +63,10 @@ class BaseModelTest extends TestCase
      * @covers ::__construct
      * @covers ::validateModelType
      * @dataProvider provideInvalidClasses
-     * @expectedException \InvalidArgumentException
      */
     public function testConstructorWithInvalidTypes($className)
     {
+        $this->expectException(InvalidArgumentException::class);
         $item = new $className();
     }
 
@@ -201,10 +201,10 @@ class BaseModelTest extends TestCase
     /**
      * @covers ::setData
      * @dataProvider provideInvalidDataForArrayModel
-     * @expectedException \InvalidArgumentException
      */
     public function testSetDataOfArrayWithInvalidData($className, $data)
     {
+        $this->expectException(InvalidArgumentException::class);
         $item = new $className();
         $item->setData($data);
     }
@@ -278,11 +278,11 @@ class BaseModelTest extends TestCase
 
     /**
      * @covers ::__set
-     * @expectedException \InvalidArgumentException
      * @dataProvider provideScalarsAndArray
      */
     public function testSetterOfScalarAndArray($className)
     {
+        $this->expectException(InvalidArgumentException::class);
         $item = new $className();
         $item->foo = 'bar';
     }
@@ -299,34 +299,34 @@ class BaseModelTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot set unknownProp property of OpenAPIServer\Mock\Model\CatRefTestClass model because it doesn't exist in related OAS schema
      * @covers ::__set
      */
     public function testSetterWithUnknownProp()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set unknownProp property of OpenAPIServer\Mock\Model\CatRefTestClass model because it doesn\'t exist in related OAS schema');
         $item = new CatRefTestClass();
         $item->unknownProp = 'foobar';
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot get unknownProp property of OpenAPIServer\Mock\Model\CatRefTestClass model because it doesn't exist in related OAS schema
      * @covers ::__get
      */
     public function testGetterWithUnknownProp()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot get unknownProp property of OpenAPIServer\Mock\Model\CatRefTestClass model because it doesn\'t exist in related OAS schema');
         $item = new CatRefTestClass();
         $unknownProp = $item->unknownProp;
     }
 
     /**
      * @covers ::__get
-     * @expectedException \InvalidArgumentException
      * @dataProvider provideScalarsAndArray
      */
     public function testGetterOfScalarAndArray($className)
     {
+        $this->expectException(InvalidArgumentException::class);
         $item = new $className();
         $bar = $item->foo;
     }
