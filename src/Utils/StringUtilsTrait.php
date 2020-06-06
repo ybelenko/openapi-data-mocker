@@ -25,8 +25,8 @@ trait StringUtilsTrait
      * Camelize name (parameter, property, method, etc)
      * This is recreated method of @link modules/openapi-generator/src/main/java/org/openapitools/codegen/utils/StringUtils.java class.
      *
-     * @param string $word                 string to be camelize
-     * @param bool   $lowercaseFirstLetter lower case for first letter if set to true
+     * @param string    $word                 String to be camelize.
+     * @param bool|null $lowercaseFirstLetter Lower case for first letter if set to true.
      *
      * @return string camelized string
      */
@@ -100,7 +100,7 @@ trait StringUtilsTrait
      * Checks whether string is reserved php keyword.
      * This is recreated method of @link modules/openapi-generator/src/main/java/org/openapitools/codegen/languages/AbstractPhpCodegen.java class.
      *
-     * @param string $word Checked string
+     * @param string $word Checked string.
      *
      * @return bool
      */

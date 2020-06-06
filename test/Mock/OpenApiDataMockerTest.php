@@ -23,6 +23,7 @@ use InvalidArgumentException;
 /**
  * OpenApiDataMockerTest
  *
+ * phpcs:disable Squiz.Commenting,Generic.Commenting,PEAR.Commenting
  * @coversDefaultClass \OpenAPIServer\Mock\OpenApiDataMocker
  */
 class OpenApiDataMockerTest extends TestCase

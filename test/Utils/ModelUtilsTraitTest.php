@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * ModelUtilsTraitTest
  *
+ * phpcs:disable Squiz.Commenting,Generic.Commenting,PEAR.Commenting
  * @coversDefaultClass \OpenAPIServer\Utils\ModelUtilsTrait
  */
 class ModelUtilsTraitTest extends TestCase

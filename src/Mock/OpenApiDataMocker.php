@@ -26,10 +26,12 @@ use InvalidArgumentException;
  */
 class OpenApiDataMocker implements IMocker
 {
+    // phpcs:disable Generic.Commenting.DocComment
     use ModelUtilsTrait;
 
     /** @var string|null Model classes namespace */
     protected $modelsNamespace;
+    // phpcs:enable
 
     /**
      * Mocks OpenApi Data. @link https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#data-types
@@ -464,7 +466,9 @@ class OpenApiDataMocker implements IMocker
     /**
      * Mock data by referenced schema.
      *
-     * @param string|null $ref Ref to model, eg. #/components/schemas/User
+     * @param string|null $ref Ref to model, eg. #/components/schemas/User.
+     *
+     * @throws \InvalidArgumentException When referenced model not found.
      *
      * @return OpenApiModelInterface
      */
@@ -488,12 +492,13 @@ class OpenApiDataMocker implements IMocker
     }
 
     /**
-     * @internal Extract OAS properties from array or object.
-     * @codeCoverageIgnore
+     * Extracts OAS properties from array.
      *
-     * @param array|object $val Processed array or object
+     * @param array $val Processed array.
      *
      * @return array
+     *
+     * @codeCoverageIgnore
      */
     private function extractSchemaProperties(array $val): array
     {
@@ -534,10 +539,19 @@ class OpenApiDataMocker implements IMocker
     }
 
     /**
-     * @internal
-     * @codeCoverageIgnore
+     * Generates random number in specified range.
+     *
+     * @param float|null $minimum          Minimum.
+     * @param float|null $maximum          Maximum.
+     * @param bool|null  $exclusiveMinimum If minimum exclusive.
+     * @param bool|null  $exclusiveMaximum If maximum exclusive.
+     * @param int|null   $maxDecimals      Max decimals.
+     *
+     * @throws InvalidArgumentException When invalid arguments passed.
      *
      * @return float|int
+     *
+     * @codeCoverageIgnore
      */
     protected function getRandomNumber(
         ?float $minimum = null,
@@ -594,9 +608,9 @@ class OpenApiDataMocker implements IMocker
     /**
      * Sets models namespace for handling $ref links.
      *
-     * @param string|null $namespace Namespace of model classes eg. JohnDoesPackage\\Model\\
+     * @param string|null $namespace Namespace of model classes eg. JohnDoesPackage\\Model\\.
      *
-     * @throws \InvalidArgumentException when namespace not a string or null
+     * @return void
      */
     public function setModelsNamespace(?string $namespace = null): void
     {

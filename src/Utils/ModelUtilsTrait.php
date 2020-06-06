@@ -27,11 +27,12 @@ trait ModelUtilsTrait
 
     /**
      * Parses model class name from provided ref.
-     * @link https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#reference-object
+     *
+     * Refs @link https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md#reference-object
      * This method doesn't check that class exists and autoloaded.
      * This is recreated method of @link modules/openapi-generator/src/main/java/org/openapitools/codegen/utils/ModelUtils.java class.
      *
-     * @param string $ref Reference, eg. #/components/schemas/Pet
+     * @param string $ref Reference, eg. #/components/schemas/Pet.
      *
      * @return string|null classname or null on fail
      */
@@ -54,9 +55,9 @@ trait ModelUtilsTrait
      * In case the name belongs to the TypeSystem it won't be renamed.
      * This is recreated method of @link modules/openapi-generator/src/main/java/org/openapitools/codegen/languages/AbstractPhpCodegen.java class.
      *
-     * @param string      $name            the name of the model
-     * @param string|null $modelNamePrefix modelNamePrefix generator option
-     * @param string|null $modelNameSuffix modelNameSuffix generator option
+     * @param string      $name            The name of the model.
+     * @param string|null $modelNamePrefix Generator modelNamePrefix  option.
+     * @param string|null $modelNameSuffix Generator modelNameSuffix option.
      *
      * @return string|null capitalized model name
      */
@@ -65,6 +66,7 @@ trait ModelUtilsTrait
         ?string $modelNamePrefix = null,
         ?string $modelNameSuffix = null
     ): ?string {
+        // phpcs:disable Squiz.Commenting.PostStatementComment,Generic.Commenting.Fixme
         if (empty($name)) {
             return null;
         }
@@ -105,5 +107,6 @@ trait ModelUtilsTrait
         // camelize the model name
         // phone_number => PhoneNumber
         return self::camelize($name);
+        // phpcs:enable
     }
 }

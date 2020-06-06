@@ -31,6 +31,7 @@ use StdClass;
 /**
  * BaseModelTest
  *
+ * phpcs:disable Squiz.Commenting,Generic.Commenting,PEAR.Commenting
  * @coversDefaultClass \OpenAPIServer\Mock\BaseModel
  */
 class BaseModelTest extends TestCase

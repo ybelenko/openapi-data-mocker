@@ -24,6 +24,8 @@ use StdClass;
  */
 class BaseModel implements OpenApiModelInterface
 {
+    // phpcs:disable Generic.Commenting.DocComment
+
     /**
      * @var string Constant with OAS schema of current class.
      * Should be overwritten by inherited class.
@@ -52,15 +54,14 @@ SCHEMA;
      * This container helps to store unusual properties like '123_prop' without renaming.
      */
     protected $dataContainer;
+    // phpcs:enable
 
     /**
      * Model constructor.
-     *
-     * @throws \InvalidArgumentException when OAS schema type is invalid
      */
     public function __construct()
     {
-        $schema = (array) static::getOpenApiSchema();
+        $schema = static::getOpenApiSchema();
         $modelType = (array_key_exists('type', $schema)) ? $schema['type'] : null;
         $this->validateModelType($modelType, true);
 
@@ -109,7 +110,9 @@ SCHEMA;
      *
      * @param mixed $data Data with values for new instance.
      *
-     * @throws \InvalidArgumentException when value for array type is invalid
+     * @throws \InvalidArgumentException When value for array type is invalid.
+     *
+     * @return void
      */
     public function setData($data): void
     {
@@ -189,12 +192,14 @@ SCHEMA;
 
     /**
      * Writes data to inaccessible (protected or private) or non-existing properties.
-     * @ref https://www.php.net/manual/en/language.oop5.overloading.php#object.set
+     * Ref @link https://www.php.net/manual/en/language.oop5.overloading.php#object.set
      *
-     * @param string $param Property name
-     * @param mixed  $value Property value
+     * @param string $param Property name.
+     * @param mixed  $value Property value.
      *
-     * @throws \InvalidArgumentException when property doesn't exist in related OAS schema
+     * @throws \InvalidArgumentException When property doesn't exist in related OAS schema.
+     *
+     * @return void
      */
     public function __set(string $param, $value): void
     {
@@ -225,11 +230,11 @@ SCHEMA;
 
     /**
      * Reads data from inaccessible (protected or private) or non-existing properties.
-     * @ref https://www.php.net/manual/en/language.oop5.overloading.php#object.get
+     * Ref @link https://www.php.net/manual/en/language.oop5.overloading.php#object.get
      *
-     * @param string $param Property name
+     * @param string $param Property name.
      *
-     * @throws \InvalidArgumentException when property doesn't exist in related OAS schema
+     * @throws \InvalidArgumentException When property doesn't exist in related OAS schema.
      *
      * @return mixed Property value
      */
@@ -262,7 +267,7 @@ SCHEMA;
 
     /**
      * Serializes the object to a value that can be serialized natively by json_encode().
-     * @ref https://www.php.net/manual/en/jsonserializable.jsonserialize.php
+     * Ref @link https://www.php.net/manual/en/jsonserializable.jsonserialize.php
      *
      * @return mixed Returns data which can be serialized by json_encode(), which is a value of any type other than a resource.
      */
@@ -274,10 +279,10 @@ SCHEMA;
     /**
      * Checks if type is valid OAS data type.
      *
-     * @param string|null $type           Model type
-     * @param bool        $throwException Throws InvalidArgumentException when set to true and processed type is invalid
+     * @param string|null $type           Model type.
+     * @param bool        $throwException Throws InvalidArgumentException when set to true and processed type is invalid.
      *
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException When $throwException set to TRUE.
      *
      * @return bool
      */
