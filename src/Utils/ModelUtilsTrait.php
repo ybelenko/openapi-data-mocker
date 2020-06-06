@@ -58,14 +58,14 @@ trait ModelUtilsTrait
      * @param string|null $modelNamePrefix modelNamePrefix generator option
      * @param string|null $modelNameSuffix modelNameSuffix generator option
      *
-     * @return string capitalized model name
+     * @return string|null capitalized model name
      */
     public static function toModelName(
         string $name,
         ?string $modelNamePrefix = null,
         ?string $modelNameSuffix = null
     ): ?string {
-        if (is_string($name) === false  || empty($name)) {
+        if (empty($name)) {
             return null;
         }
 
@@ -93,11 +93,11 @@ trait ModelUtilsTrait
 
         // add prefix and/or suffic only if name does not start wth \ (e.g. \DateTime)
         if (preg_match('/^\\\\.*/', $name) !== 1) {
-            if (is_string($modelNamePrefix) && !empty($modelNamePrefix)) {
+            if (!empty($modelNamePrefix)) {
                 $name = $modelNamePrefix . '_' . $name;
             }
 
-            if (is_string($modelNameSuffix) && !empty($modelNameSuffix)) {
+            if (!empty($modelNameSuffix)) {
                 $name = $name . '_' . $modelNameSuffix;
             }
         }

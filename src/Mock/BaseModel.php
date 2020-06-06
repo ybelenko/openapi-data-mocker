@@ -87,7 +87,7 @@ SCHEMA;
      */
     public static function getOpenApiSchema(): array
     {
-        return json_decode(static::MODEL_SCHEMA);
+        return json_decode(static::MODEL_SCHEMA, true);
     }
 
     /**

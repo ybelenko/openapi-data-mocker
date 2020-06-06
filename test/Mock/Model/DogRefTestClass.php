@@ -34,7 +34,7 @@ SCHEMA;
     /**
      * @inheritdoc Override static method.
      */
-    public static function getOpenApiSchema()
+    public static function getOpenApiSchema(): array
     {
         // return assoc array instead of object for test purpose
         return json_decode(static::MODEL_SCHEMA, true);

@@ -76,7 +76,6 @@ class OpenApiDataMockerTest extends TestCase
         return [
             ['foobar', null, null],
             [3.14, null, null],
-            [null, null, null],
         ];
     }
 
@@ -166,8 +165,6 @@ class OpenApiDataMockerTest extends TestCase
     public function provideMockIntegerInvalidArguments()
     {
         return [
-            [null, 'foo', null, false, false],
-            [null, null, false, false, false],
             [null, null, null, true, false],
             [null, null, null, false, true],
             [null, 100, -100, false, false],
@@ -200,7 +197,6 @@ class OpenApiDataMockerTest extends TestCase
             [IMocker::DATA_FORMAT_INT64, -10, 10, -10, 10],
             [IMocker::DATA_FORMAT_INT32, -9223372036854775807, 9223372036854775807, -2147483647, 2147483647],
             [strtoupper(IMocker::DATA_FORMAT_INT32), -2147483648, 2147483648, -2147483647, 2147483647],
-            [strtoupper(IMocker::DATA_FORMAT_INT64), '-9223372036854775808', '9223372036854775808', -9223372036854775807, 9223372036854775807],
         ];
     }
 
@@ -278,8 +274,6 @@ class OpenApiDataMockerTest extends TestCase
     public function provideMockNumberInvalidArguments()
     {
         return [
-            [null, 'foo', null, false, false],
-            [null, null, false, false, false],
             [null, null, null, true, false],
             [null, null, null, false, true],
             [null, 100, -100, false, false],
@@ -378,12 +372,7 @@ class OpenApiDataMockerTest extends TestCase
             'negative minLength' => [null, -10, null],
             'negative maxLength' => [null, 0, -10],
             'both minLength maxLength negative' => [null, -10, -10],
-            'decimal minLength and maxLength' => [null, 0.5, 0.5],
-            'string minLength' => [null, '10', null],
-            'string maxLength' => [null, 0, '50'],
-            'string minLength and maxLength' => [null, '10', '50'],
             'maxLength less than minLength' => [null, 50, 10],
-            'enum is string' => [null, null, null, 'foobar'],
             'enum is empty array' => [null, null, null, []],
             'enum array is not unique' => [null, null, null, ['foobar', 'foobaz', 'foobar']],
         ];
@@ -750,9 +739,9 @@ class OpenApiDataMockerTest extends TestCase
         $intItems = ['type' => IMocker::DATA_TYPE_INTEGER, 'minimum' => 5, 'maximum' => 10];
         $floatItems = ['type' => IMocker::DATA_TYPE_NUMBER, 'minimum' => -32.4, 'maximum' => 88.6, 'exclusiveMinimum' => true, 'exclusiveMaximum' => true];
         $strItems = ['type' => IMocker::DATA_TYPE_STRING, 'minLength' => 20, 'maxLength' => 50];
-        $boolItems = (object) ['type' => IMocker::DATA_TYPE_BOOLEAN];
-        $arrayItems = (object) ['type' => IMocker::DATA_TYPE_ARRAY, 'items' => ['type' => IMocker::DATA_TYPE_STRING, 'minItems' => 3, 'maxItems' => 10]];
-        $objectItems = (object) ['type' => IMocker::DATA_TYPE_OBJECT, 'properties' => (object)['username' => ['type' => IMocker::DATA_TYPE_STRING]]];
+        $boolItems = ['type' => IMocker::DATA_TYPE_BOOLEAN];
+        $arrayItems = ['type' => IMocker::DATA_TYPE_ARRAY, 'items' => ['type' => IMocker::DATA_TYPE_STRING, 'minItems' => 3, 'maxItems' => 10]];
+        $objectItems = ['type' => IMocker::DATA_TYPE_OBJECT, 'properties' => ['username' => ['type' => IMocker::DATA_TYPE_STRING]]];
         $expectedInt = IsType::TYPE_INT;
         $expectedFloat = IsType::TYPE_FLOAT;
         $expectedStr = IsType::TYPE_STRING;
@@ -823,29 +812,11 @@ class OpenApiDataMockerTest extends TestCase
         $intItems = ['type' => IMocker::DATA_TYPE_INTEGER];
 
         return [
-            'items is nor array' => [
-                'foobar', null, null, false,
-            ],
-            'items doesn\'t have "type" key' => [
-                ['foobar' => 'foobaz'], null, null, false,
-            ],
-            'minItems is not integer' => [
-                $intItems, 3.12, null, false,
-            ],
             'minItems is negative' => [
                 $intItems, -10, null, false,
             ],
-            'minItems is not number' => [
-                $intItems, '1', null, false,
-            ],
-            'maxItems is not integer' => [
-                $intItems, null, 3.12, false,
-            ],
             'maxItems is negative' => [
                 $intItems, null, -10, false,
-            ],
-            'maxItems is not number' => [
-                $intItems, null, 'foobaz', false,
             ],
             'maxItems less than minItems' => [
                 $intItems, 5, 2, false,
@@ -928,9 +899,6 @@ class OpenApiDataMockerTest extends TestCase
             'empty object' => [
                 [], 1, 10, true, null, [],
             ],
-            'empty object from StdClass' => [
-                new StdClass(), 1, 5, false, null, [],
-            ],
             'object with username property' => [
                 [
                     'username' => [
@@ -939,7 +907,7 @@ class OpenApiDataMockerTest extends TestCase
                 ], 0, 5, $additionProps, null, ['username'],
             ],
             'object with foobar property' => [
-                (object) [
+                [
                     'foobar' => [
                         'type' => IMocker::DATA_TYPE_INTEGER,
                     ],
@@ -967,44 +935,20 @@ class OpenApiDataMockerTest extends TestCase
     public function provideMockObjectInvalidArguments()
     {
         return [
-            'properties cannot be null' => [
-                null, 0, 10, false, null,
-            ],
-            'properties cannot be a string' => [
-                'foobar', 0, 10, false, null,
-            ],
             'property value cannot be a string' => [
                 ['username' => 'foobar'], 0, 10, false, null,
-            ],
-            'minProperties is not integer' => [
-                [], 3.12, null, false, null,
             ],
             'minProperties is negative' => [
                 [], -10, null, false, null,
             ],
-            'minProperties is not number' => [
-                [], '1', null, false, null,
-            ],
-            'maxProperties is not integer' => [
-                [], null, 3.12, false, null,
-            ],
             'maxProperties is negative' => [
                 [], null, -10, false, null,
-            ],
-            'maxProperties is not number' => [
-                [], null, 'foobaz', false, null,
             ],
             'maxProperties less than minProperties' => [
                 [], 5, 2, false, null,
             ],
             'additionalProperties is not object|array|boolean' => [
                 [], null, null, 'foobar', null,
-            ],
-            'required is object, not array' => [
-                [], null, null, null, new StdClass(),
-            ],
-            'required is not array' => [
-                [], null, null, null, 'foobar',
             ],
             'required array with duplicates' => [
                 [], null, null, null, ['username', 'username'],
@@ -1023,7 +967,7 @@ class OpenApiDataMockerTest extends TestCase
         $mocker = new OpenApiDataMocker();
         $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $obj = $mocker->mockObject(
-            (object) [
+            [
                 'cat' => [
                     '$ref' => '#/components/schemas/CatRefTestClass',
                 ],
@@ -1050,52 +994,25 @@ class OpenApiDataMockerTest extends TestCase
     public function provideMockFromSchemaCorrectArguments()
     {
         return [
-            'string from object' => [
-                (object) ['type' => IMocker::DATA_TYPE_STRING],
-                IsType::TYPE_STRING,
-            ],
             'string from array' => [
                 ['type' => IMocker::DATA_TYPE_STRING],
                 IsType::TYPE_STRING,
-            ],
-            'integer from object' => [
-                (object) ['type' => IMocker::DATA_TYPE_INTEGER],
-                IsType::TYPE_INT,
             ],
             'integer from array' => [
                 ['type' => IMocker::DATA_TYPE_INTEGER],
                 IsType::TYPE_INT,
             ],
-            'number from object' => [
-                (object) ['type' => IMocker::DATA_TYPE_NUMBER],
-                IsType::TYPE_FLOAT,
-            ],
             'number from array' => [
                 ['type' => IMocker::DATA_TYPE_NUMBER],
                 IsType::TYPE_FLOAT,
-            ],
-            'string from object' => [
-                (object) ['type' => IMocker::DATA_TYPE_STRING],
-                IsType::TYPE_STRING,
             ],
             'string from array' => [
                 ['type' => IMocker::DATA_TYPE_STRING],
                 IsType::TYPE_STRING,
             ],
-            'boolean from object' => [
-                (object) ['type' => IMocker::DATA_TYPE_BOOLEAN],
-                IsType::TYPE_BOOL,
-            ],
             'boolean from array' => [
                 ['type' => IMocker::DATA_TYPE_BOOLEAN],
                 IsType::TYPE_BOOL,
-            ],
-            'array of strings from object' => [
-                (object) [
-                    'type' => IMocker::DATA_TYPE_ARRAY,
-                    'items' => ['type' => IMocker::DATA_TYPE_STRING],
-                ],
-                IsType::TYPE_ARRAY,
             ],
             'array of strings from array' => [
                 [
@@ -1103,13 +1020,6 @@ class OpenApiDataMockerTest extends TestCase
                     'items' => ['type' => IMocker::DATA_TYPE_STRING],
                 ],
                 IsType::TYPE_ARRAY,
-            ],
-            'object with username prop from object' => [
-                (object) [
-                    'type' => IMocker::DATA_TYPE_OBJECT,
-                    'properties' => ['username' => ['type' => IMocker::DATA_TYPE_STRING]],
-                ],
-                IsType::TYPE_OBJECT,
             ],
             'object with username prop from array' => [
                 [
@@ -1140,12 +1050,7 @@ class OpenApiDataMockerTest extends TestCase
     public function provideMockFromSchemaInvalidArguments()
     {
         return [
-            'null' => [null],
-            'numeric' => [3.14],
             'empty array' => [[]],
-            'empty object' => [(object) []],
-            'string' => ['foobar'],
-            'DateTime object' => [new DateTime()],
         ];
     }
 
@@ -1210,29 +1115,5 @@ class OpenApiDataMockerTest extends TestCase
         // reset namespace
         $mocker->setModelsNamespace();
         $this->assertNull($mocker->getModelsNamespace());
-    }
-
-    /**
-     * @dataProvider provideSetModelsNamespaceInvalidArguments
-     * @expectedException \InvalidArgumentException
-     * @covers ::setModelsNamespace
-     * @covers ::getModelsNamespace
-     */
-    public function testSetModelsNamespaceSetterAndGetterWithIncorrectArguments($namespace)
-    {
-        $mocker = new OpenApiDataMocker();
-        $mocker->setModelsNamespace($namespace);
-    }
-
-    public function provideSetModelsNamespaceInvalidArguments()
-    {
-        return [
-            'number' => [355],
-            'float' => [3.14],
-            'bool' => [false],
-            'array' => [[]],
-            'DateTime' => [new DateTime()],
-            'StdClass' => [new StdClass()],
-        ];
     }
 }

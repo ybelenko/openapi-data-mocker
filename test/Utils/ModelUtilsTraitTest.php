@@ -46,14 +46,11 @@ class ModelUtilsTraitTest extends TestCase
             'Relative Documents With Embedded Schema' => [
                 'definitions.json#/Pet', null,
             ],
-            'null as argument' => [
-                null, null,
-            ],
-            'number as argument' => [
-                156, null,
-            ],
             'inline response 200' => [
                 '#/components/schemas/inline_response_200', 'inline_response_200',
+            ],
+            'empty string argument' => [
+                '', null,
             ],
         ];
     }
@@ -83,8 +80,8 @@ class ModelUtilsTraitTest extends TestCase
             ['abcd', null, 'WithEnd', 'AbcdWithEnd'],
             ['abcd', 'WithStart', 'AndEnd', 'WithStartAbcdAndEnd'],
             ['_foobar_Objects', null, null, 'FoobarObjects'],
-            [null, null, null, null],
             ['inline_response_200', null, null, 'InlineResponse200'],
+            ['', null, null, null],
         ];
     }
 }

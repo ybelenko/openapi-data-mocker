@@ -80,7 +80,6 @@ class StringUtilsTraitTest extends TestCase
             ['DateTime', false],
             ['Pet', false],
             [123, false],
-            [null, false],
         ];
     }
 }

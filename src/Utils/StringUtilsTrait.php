@@ -106,9 +106,6 @@ trait StringUtilsTrait
      */
     public static function isReservedWord(string $word): bool
     {
-        if (is_string($word) === false) {
-            return false;
-        }
         // __halt_compiler is ommited because class names with underscores not allowed anyway
         return in_array(
             strtolower($word),

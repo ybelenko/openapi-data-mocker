@@ -124,7 +124,7 @@ class OpenApiDataMocker implements IMocker
                 // do nothing, unsupported format
         }
 
-        return $this->getRandomNumber($minimum, $maximum, $exclusiveMinimum, $exclusiveMaximum, 0);
+        return (int) $this->getRandomNumber($minimum, $maximum, $exclusiveMinimum, $exclusiveMaximum, 0);
     }
 
     /**
@@ -208,9 +208,7 @@ class OpenApiDataMocker implements IMocker
         }
 
         if ($minLength !== 0 && $minLength !== null) {
-            if (is_int($minLength) === false) {
-                throw new InvalidArgumentException('"minLength" must be an integer');
-            } elseif ($minLength < 0) {
+            if ($minLength < 0) {
                 throw new InvalidArgumentException('"minLength" must be greater than, or equal to, 0');
             }
         } else {
@@ -218,9 +216,7 @@ class OpenApiDataMocker implements IMocker
         }
 
         if ($maxLength !== null) {
-            if (is_int($maxLength) === false) {
-                throw new InvalidArgumentException('"maxLength" must be an integer');
-            } elseif ($maxLength < 0) {
+            if ($maxLength < 0) {
                 throw new InvalidArgumentException('"maxLength" must be greater than, or equal to, 0');
             }
         } else {
@@ -250,7 +246,7 @@ class OpenApiDataMocker implements IMocker
             case IMocker::DATA_FORMAT_DATE:
             case IMocker::DATA_FORMAT_DATE_TIME:
                 // min unix timestamp is 0 and max is 2147483647 for 32bit systems which equals 2038-01-19 03:14:07
-                $date = DateTime::createFromFormat('U', mt_rand(0, 2147483647));
+                $date = DateTime::createFromFormat('U', (string) mt_rand(0, 2147483647));
                 $str = ($dataFormat === IMocker::DATA_FORMAT_DATE) ? $date->format('Y-m-d') : $date->format('Y-m-d\TH:i:sP');
 
                 // truncate or pad datestring to fit minLength and maxLength
@@ -334,24 +330,20 @@ class OpenApiDataMocker implements IMocker
         $minSize = 0;
         $maxSize = \PHP_INT_MAX;
 
-        if (
-            (is_array($items) === false && is_object($items) === false)
-            || (is_array($items) && array_key_exists('type', $items) === false)
-            || (is_object($items) && isset($items->type) === false)
-        ) {
-            new InvalidArgumentException('"items" must be object or assoc array with "type" key');
+        if ($items && array_key_exists('type', $items) === false) {
+            new InvalidArgumentException('"items" must assoc array with "type" key');
         }
 
         if ($minItems !== null) {
-            if (is_integer($minItems) === false || $minItems < 0) {
-                throw new InvalidArgumentException('"mitItems" must be an integer. This integer must be greater than, or equal to, 0');
+            if ($minItems < 0) {
+                throw new InvalidArgumentException('"mitItems" must be an integer greater than, or equal to, 0');
             }
             $minSize = $minItems;
         }
 
         if ($maxItems !== null) {
-            if (is_integer($maxItems) === false || $maxItems < 0) {
-                throw new InvalidArgumentException('"maxItems" must be an integer. This integer must be greater than, or equal to, 0.');
+            if ($maxItems < 0) {
+                throw new InvalidArgumentException('"maxItems" must be an integer greater than, or equal to, 0.');
             }
             if ($maxItems < $minItems) {
                 throw new InvalidArgumentException('"maxItems" value cannot be less than "minItems"');
@@ -399,10 +391,6 @@ class OpenApiDataMocker implements IMocker
     ): object {
         $obj = new StdClass();
 
-        if (is_object($properties) === false && is_array($properties) === false) {
-            throw new InvalidArgumentException('The value of "properties" must be an array or object');
-        }
-
         foreach ($properties as $propName => $propValue) {
             if (is_object($propValue) === false && is_array($propValue) === false) {
                 throw new InvalidArgumentException('Each value of "properties" must be an array or object');
@@ -410,14 +398,14 @@ class OpenApiDataMocker implements IMocker
         }
 
         if ($minProperties !== null) {
-            if (is_integer($minProperties) === false || $minProperties < 0) {
-                throw new InvalidArgumentException('"minProperties" must be an integer. This integer must be greater than, or equal to, 0');
+            if ($minProperties < 0) {
+                throw new InvalidArgumentException('"minProperties" must be integer greater than, or equal to, 0');
             }
         }
 
         if ($maxProperties !== null) {
-            if (is_integer($maxProperties) === false || $maxProperties < 0) {
-                throw new InvalidArgumentException('"maxProperties" must be an integer. This integer must be greater than, or equal to, 0.');
+            if ($maxProperties < 0) {
+                throw new InvalidArgumentException('"maxProperties" must be an integer greater than, or equal to, 0.');
             }
             if ($maxProperties < $minProperties) {
                 throw new InvalidArgumentException('"maxProperties" value cannot be less than "minProperties"');
@@ -431,11 +419,8 @@ class OpenApiDataMocker implements IMocker
         }
 
         if ($required !== null) {
-            if (
-                is_array($required) === false
-                || count($required) > count(array_unique($required))
-            ) {
-                throw new InvalidArgumentException('The value of "required" must be an array. Elements of this array must be unique.');
+            if (count($required) > count(array_unique($required))) {
+                throw new InvalidArgumentException('The value of "required" must be an array of unique elements.');
             }
             foreach ($required as $requiredPropName) {
                 if (is_string($requiredPropName) === false) {
@@ -471,7 +456,7 @@ class OpenApiDataMocker implements IMocker
         if (array_key_exists('$ref', $props) && !empty($props['$ref'])) {
             return $this->mockFromRef($props['$ref']);
         } elseif ($props['type'] === null) {
-            throw new InvalidArgumentException('"schema" must be object or assoc array with "type" property');
+            throw new InvalidArgumentException('"schema" must be assoc array with "type" property');
         }
         return $this->mock($props['type'], $props['format'], $props);
     }
@@ -541,10 +526,8 @@ class OpenApiDataMocker implements IMocker
                 '$ref',
             ] as $propName
         ) {
-            if (is_array($val) && array_key_exists($propName, $val)) {
+            if ($val && array_key_exists($propName, $val)) {
                 $props[$propName] = $val[$propName];
-            } elseif (is_object($val) && isset($val->$propName)) {
-                $props[$propName] = $val->$propName;
             }
         }
         return $props;
@@ -581,18 +564,14 @@ class OpenApiDataMocker implements IMocker
         }
 
         if ($exclusiveMinimum !== false) {
-            if (is_bool($exclusiveMinimum) === false) {
-                throw new InvalidArgumentException('"exclusiveMinimum" must be a boolean');
-            } elseif ($minimum === null) {
+            if ($minimum === null) {
                 throw new InvalidArgumentException('If "exclusiveMinimum" is present, "minimum" must also be present');
             }
             $min += 1;
         }
 
         if ($exclusiveMaximum !== false) {
-            if (is_bool($exclusiveMaximum) === false) {
-                throw new InvalidArgumentException('"exclusiveMaximum" must be a boolean');
-            } elseif ($maximum === null) {
+            if ($maximum === null) {
                 throw new InvalidArgumentException('If "exclusiveMaximum" is present, "maximum" must also be present');
             }
             $max -= 1;
@@ -604,6 +583,10 @@ class OpenApiDataMocker implements IMocker
 
         if ($maxDecimals > 0) {
             return round($min + mt_rand() / mt_getrandmax() * ($max - $min), $maxDecimals);
+        }
+        if ($min >= \PHP_INT_MAX || $min <= \PHP_INT_MIN || $max >= \PHP_INT_MAX || $max <= \PHP_INT_MIN) {
+            // mt_rand accepts only integers
+            return round($min + mt_rand() / mt_getrandmax() * ($max - $min));
         }
         return mt_rand((int) $min, (int) $max);
     }
@@ -617,10 +600,6 @@ class OpenApiDataMocker implements IMocker
      */
     public function setModelsNamespace(?string $namespace = null): void
     {
-        if ($namespace !== null && !is_string($namespace)) {
-            throw new InvalidArgumentException('"namespace" must be a string or null');
-        }
-
         $this->modelsNamespace = $namespace;
     }
 
