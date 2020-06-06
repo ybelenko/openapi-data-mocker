@@ -4,6 +4,7 @@
 
     <!-- Don't need to inspect installed packages -->
     <exclude-pattern>./vendor</exclude-pattern>
+    <exclude-pattern>./test/Mock/Model</exclude-pattern>
 
     <!-- <basepath>     A path to strip from the front of file paths inside reports -->
     <arg name="basepath" value="."/>
@@ -25,6 +26,34 @@
     <rule ref="PSR12">
         <!-- There is no way to wrap generated comments, just disable that rule for now -->
         <exclude name="Generic.Files.LineLength.TooLong" />
+    </rule>
+    <rule ref="Squiz.Commenting">
+        <exclude name="Squiz.Commenting.FileComment.IncorrectAuthor" />
+        <!-- @subpackage tag is considered deprecated -->
+        <exclude name="Squiz.Commenting.FileComment.MissingSubpackageTag" />
+        <exclude name="Squiz.Commenting.FileComment.SubpackageTagOrder" />
+        <!-- violates PSR12.Files.FileHeader.SpacingAfterBlock -->
+        <exclude name="Squiz.Commenting.FileComment.SpacingAfterOpen" />
+        <exclude name="Squiz.Commenting.ClosingDeclarationComment.Missing" />
+        <exclude name="Squiz.Commenting.FileComment.MissingCopyrightTag" />
+        <exclude name="Squiz.Commenting.FileComment.CopyrightTagOrder" />
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectParamVarName" />
+        <exclude name="Squiz.Commenting.FunctionComment.InvalidReturn" />
+        <!-- same sniff in PEAR standard presented -->
+        <exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType" />
+        <exclude name="Squiz.Commenting.InlineComment.NotCapital" />
+        <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
+        <exclude name="Squiz.Commenting.LongConditionClosingComment.Missing" />
+    </rule>
+    <rule ref="Generic.Commenting"/>
+    <rule ref="PEAR.Commenting">
+        <exclude name="PEAR.Commenting.ClassComment" />
+        <!-- @category tag is considered deprecated -->
+        <exclude name="PEAR.Commenting.FileComment.MissingCategoryTag" />
+        <exclude name="PEAR.Commenting.FileComment.IncompleteLicense" />
+        <exclude name="PEAR.Commenting.FileComment.LicenseTagOrder" />
+        <!-- violates Squiz.Commenting.FileComment.AuthorTagOrder -->
+        <exclude name="PEAR.Commenting.FileComment.AuthorTagOrder" />
     </rule>
 
     <!-- Paths to check -->
