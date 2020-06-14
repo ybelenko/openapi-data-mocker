@@ -117,7 +117,8 @@ SCHEMA;
     public function setData($data): void
     {
         $schema = (array) static::getOpenApiSchema();
-        switch ($schema['type']) {
+        $modelType = (array_key_exists('type', $schema)) ? $schema['type'] : null;
+        switch ($modelType) {
             case IMocker::DATA_TYPE_ARRAY:
                 // data for array OAS type should be straight indexed array
                 if (is_array($data)) {
@@ -163,7 +164,8 @@ SCHEMA;
     {
         $data = null;
         $schema = (array) static::getOpenApiSchema();
-        switch ($schema['type']) {
+        $modelType = (array_key_exists('type', $schema)) ? $schema['type'] : null;
+        switch ($modelType) {
             case IMocker::DATA_TYPE_OBJECT:
                 // need to convert data container to object
                 $data = new StdClass();
@@ -289,7 +291,7 @@ SCHEMA;
     protected function validateModelType(?string $type = null, bool $throwException = true): bool
     {
         $isValid = in_array($type, static::VALID_OAS_DATA_TYPES);
-        if ($isValid === false && $throwException) {
+        if ($type !== null && $isValid === false && $throwException) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Invalid OAS schema of %s model, "type" must be one of %s',

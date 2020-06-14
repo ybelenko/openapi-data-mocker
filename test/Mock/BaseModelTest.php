@@ -57,6 +57,7 @@ class BaseModelTest extends TestCase
             'string model' => [BasicStringTestClass::class, json_encode(null)],
             'array model' => [BasicArrayTestClass::class, json_encode([])],
             'object model' => [BasicObjectTestClass::class, json_encode(new StdClass())],
+            'missing type model' => [MissingTypeTestClass::class, json_encode(null)],
         ];
     }
 
@@ -75,7 +76,6 @@ class BaseModelTest extends TestCase
     {
         return [
             'unknown type model' => [UnknownTypeTestClass::class],
-            'missing type model' => [MissingTypeTestClass::class],
         ];
     }
 
