@@ -1,7 +1,9 @@
 language: php
-dist: xenial
+dist: bionic
 php:
   - 7.2
+  - 7.3
+  - 7.4
 
 install:
   - composer install --dev --no-interaction
