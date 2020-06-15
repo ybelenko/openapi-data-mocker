@@ -19,39 +19,141 @@ composer require ybelenko/openapi-data-mocker
 
 ## Usage example
 
+Imagine we have [OpenAPI Specification 3.0.3 - Schema Object](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md#schema-object) like this:
+```yaml
+description: Real world example schema
+type: object
+properties:
+  id:
+    type: integer
+    format: int32
+    minimum: 1
+  purchased_items:
+    type: array
+    items:
+      type: object
+      properties:
+        SKU:
+          type: string
+          format: uuid
+          maxLength: 20
+        quantity:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+        price:
+          type: object
+          properties:
+            currency:
+              type: string
+              minLength: 3
+              maxLength: 3
+              enum:
+              - USD
+              - EUR
+              - RUB
+            value:
+              type: number
+              format: float
+              minimum: 0.01
+              maximum: 99.99
+        manufacturer:
+          type: object
+          properties:
+            name:
+              type: string
+              maxLength: 30
+            country:
+              type: string
+              enum:
+              - CHN
+              - USA
+              - RUS
+  buyer:
+    type: object
+    properties:
+      first_name:
+        type: string
+        minLength: 3
+        maxLength: 15
+      last_name:
+        type: string
+        minLength: 3
+        maxLength: 15
+      credit_card:
+        type: integer
+        minimum: 1000000000000000
+        maximum: 10000000000000000
+      phone:
+        type: integer
+        minimum: 10000000000000
+        maximum: 99999999999999
+      email:
+        type: string
+        format: email
+  status:
+    type: string
+    enum:
+    - registered
+    - paid
+    - shipped
+    - delivered
+    default: registered
+  created_at:
+    type: string
+    format: date-time
+```
+> Notice! While schema object presented in YAML format this library doesn't support YAML or JSON parsing right now. It means that `mockFromSchema` method expects already decoded JSON value as argument.
+
+When we mock mentioned schema with `mockFromSchema` method:
 ```php
 require __DIR__ . '/vendor/autoload.php';
 
 use OpenAPIServer\Mock\OpenApiDataMocker as Mocker;
 $mocker = new Mocker();
 // set model classes namespace for $ref handling
+// current example doesn't use $refs in schemas, however
 $mocker->setModelsNamespace('JohnDoesPackage\\Model\\');
-$data = [
-    'Integer from 1 to 100' => $mocker->mockInteger(null, 1, 100),
-    'Float from -3 to 3' =>  $mocker->mockNumber(null, -3, 3),
-    'String 10 chars' => $mocker->mockString(null, 10, 10),
-    'Boolean' =>  $mocker->mockBoolean(),
-    'Array of strings' => $mocker->mockArray(
-        [
-            'type' => 'string',
-            'maxLength' => 20,
-        ]
-    ),
-    'Object' => $mocker->mockObject([
-        'id' => [
-            'type' => 'integer',
-            'minimum' => 1,
-            'maximum' => 10
-        ],
-        'username' => [
-            'type' => 'string',
-            'maxLength' => 10,
-        ]
-    ])
-];
-
-echo json_encode($data, JSON_PRETTY_PRINT);
+// class InvoiceTest contains schema mentioned previously
+// it returns that schema with getOpenApiSchema() method declared in OpenAPIServer\Mock\BaseModel parent class
+$schema = \OpenAPIServer\Mock\Model\InvoiceTest::getOpenApiSchema();
+$data = $mocker->mockFromSchema($schema);
+echo json_encode($data, \JSON_PRETTY_PRINT);
 ```
+
+the output looks like:
+```json
+{
+    "id": 1912777939,
+    "purchased_items": [
+        {
+            "SKU": "5ee78cfde9f05",
+            "quantity": 4,
+            "price": {
+                "currency": "EUR",
+                "value": 57.635
+            },
+            "manufacturer": {
+                "name": "Lorem i",
+                "country": "USA"
+            }
+        }
+    ],
+    "buyer": {
+        "first_name": "Lorem ipsum do",
+        "last_name": "Lorem ipsum ",
+        "credit_card": 2455087473915908,
+        "phone": 65526260517693,
+        "email": "jfkennedy@example.com"
+    },
+    "status": "delivered",
+    "created_at": "1978-08-08T04:03:09+00:00"
+}
+```
+Of course that output will be slightly different on every call. That's what mocker package has been developed for.
+
+You can check extended example at [examples/extended_example.php](examples/extended_example.php).
 
 ## Supported features
 
