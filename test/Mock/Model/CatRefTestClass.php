@@ -2,10 +2,10 @@
 
 namespace OpenAPIServer\Mock\Model;
 
-use OpenAPIServer\Mock\BaseModel;
+use OpenAPIServer\Mock\Model\BaseModelExample;
 use OpenAPIServer\Mock\MockableInterface;
 
-class CatRefTestClass extends BaseModel
+class CatRefTestClass extends BaseModelExample
 {
     protected const MODEL_SCHEMA = <<<'SCHEMA'
 {

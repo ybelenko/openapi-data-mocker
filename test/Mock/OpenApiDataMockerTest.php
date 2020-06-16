@@ -831,8 +831,9 @@ class OpenApiDataMockerTest extends TestCase
         $this->assertCount(1, $arr);
         foreach ($arr as $item) {
             $this->assertInstanceOf('OpenAPIServer\\Mock\\Model\\CatRefTestClass', $item);
+            $data = $item->jsonSerialize();
             foreach ($expectedStructure as $expectedProp => $assertMethod) {
-                $this->$assertMethod($item->$expectedProp);
+                $this->$assertMethod($data->$expectedProp);
             }
         }
     }
@@ -962,9 +963,10 @@ class OpenApiDataMockerTest extends TestCase
             ]
         );
         $this->assertIsObject($obj->cat);
-        $this->assertIsString($obj->cat->className);
-        $this->assertIsString($obj->cat->color);
-        $this->assertIsBool($obj->cat->declawed);
+        $data = $obj->cat->jsonSerialize();
+        $this->assertIsString($data->className);
+        $this->assertIsString($data->color);
+        $this->assertIsBool($data->declawed);
     }
 
     /**
@@ -1050,7 +1052,7 @@ class OpenApiDataMockerTest extends TestCase
     {
         $mocker = new OpenApiDataMocker();
         $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
-        $data = $mocker->mockFromRef($ref);
+        $data = $mocker->mockFromRef($ref)->jsonSerialize();
         foreach ($expectedStructure as $expectedProp => $assertMethod) {
             $this->$assertMethod($data->$expectedProp);
         }

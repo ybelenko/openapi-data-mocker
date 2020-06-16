@@ -2,9 +2,9 @@
 
 namespace OpenAPIServer\Mock\Model;
 
-use OpenAPIServer\Mock\BaseModel;
+use OpenAPIServer\Mock\Model\BaseModelExample;
 
-class UnknownTypeTestClass extends BaseModel
+class UnknownTypeTestClass extends BaseModelExample
 {
     protected const MODEL_SCHEMA = <<<'SCHEMA'
 {
