@@ -830,10 +830,9 @@ class OpenApiDataMockerTest extends TestCase
         $this->assertIsArray($arr);
         $this->assertCount(1, $arr);
         foreach ($arr as $item) {
-            $this->assertInstanceOf('OpenAPIServer\\Mock\\Model\\CatRefTestClass', $item);
-            $data = $item->jsonSerialize();
+            $this->assertNotInstanceOf('OpenAPIServer\\Mock\\Model\\CatRefTestClass', $item);
             foreach ($expectedStructure as $expectedProp => $assertMethod) {
-                $this->$assertMethod($data->$expectedProp);
+                $this->$assertMethod($item->$expectedProp);
             }
         }
     }
@@ -963,10 +962,9 @@ class OpenApiDataMockerTest extends TestCase
             ]
         );
         $this->assertIsObject($obj->cat);
-        $data = $obj->cat->jsonSerialize();
-        $this->assertIsString($data->className);
-        $this->assertIsString($data->color);
-        $this->assertIsBool($data->declawed);
+        $this->assertIsString($obj->cat->className);
+        $this->assertIsString($obj->cat->color);
+        $this->assertIsBool($obj->cat->declawed);
     }
 
     /**
@@ -1047,14 +1045,25 @@ class OpenApiDataMockerTest extends TestCase
     /**
      * @dataProvider provideMockFromRefCorrectArguments
      * @covers ::mockFromRef
+     * @covers ::mockModelFromRef
+     * @covers ::refToModelClass
      */
     public function testMockFromRefWithCorrectArguments($ref, $expectedStructure)
     {
         $mocker = new OpenApiDataMocker();
         $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
-        $data = $mocker->mockFromRef($ref)->jsonSerialize();
-        foreach ($expectedStructure as $expectedProp => $assertMethod) {
-            $this->$assertMethod($data->$expectedProp);
+        $data = $mocker->mockFromRef($ref);
+        $model = $mocker->mockModelFromRef($ref);
+        if ($data && $model) {
+            foreach ($expectedStructure as $expectedProp => $assertMethod) {
+                $this->$assertMethod($data->$expectedProp);
+                $this->$assertMethod($model->jsonSerialize()->$expectedProp);
+            }
+        }
+
+        if (empty($ref)) {
+            $this->assertNull($data);
+            $this->assertNull($model);
         }
     }
 
@@ -1069,12 +1078,17 @@ class OpenApiDataMockerTest extends TestCase
                     'declawed' => 'assertIsBool',
                 ]
             ],
+            'empty string' => [
+                '',
+                null,
+            ],
         ];
     }
 
     /**
      * @dataProvider provideMockFromRefInvalidArguments
      * @covers ::mockFromRef
+     * @covers ::refToModelClass
      */
     public function testMockFromRefWithInvalidArguments($ref)
     {
@@ -1084,11 +1098,25 @@ class OpenApiDataMockerTest extends TestCase
         $data = $mocker->mockFromRef($ref);
     }
 
+    /**
+     * @dataProvider provideMockFromRefInvalidArguments
+     * @covers ::mockModelFromRef
+     * @covers ::refToModelClass
+     */
+    public function testMockModelFromRefWithInvalidArguments($ref)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $mocker = new OpenApiDataMocker();
+        $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
+        $model = $mocker->mockModelFromRef($ref);
+    }
+
     public function provideMockFromRefInvalidArguments()
     {
         return [
             'ref to unknown class' => ['#/components/schemas/UnknownClass'],
             'ref to class without getOpenApiSchema method' => ['#/components/schemas/ClassWithoutGetSchemaMethod'],
+            'ref to class doesn\'t implement model OpenApiModelInterface' => ['#/components/schemas/ClassNotImplementModelInterface'],
         ];
     }
 
