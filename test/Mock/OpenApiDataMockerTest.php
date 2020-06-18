@@ -14,11 +14,12 @@ namespace OpenAPIServer\Mock;
 
 use OpenAPIServer\Mock\OpenApiDataMocker;
 use OpenAPIServer\Mock\OpenApiDataMockerInterface as IMocker;
+use OpenAPIServer\Mock\Exceptions\OpenApiDataMockerException;
+use OpenAPIServer\Mock\Exceptions\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Constraint\IsType;
 use StdClass;
 use DateTime;
-use InvalidArgumentException;
 
 /**
  * OpenApiDataMockerTest
@@ -67,7 +68,7 @@ class OpenApiDataMockerTest extends TestCase
      */
     public function testMockInvalidArguments($dataType, $dataFormat, $options)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(OpenApiDataMockerException::class);
         $this->expectExceptionMessage('"dataType" must be one of integer, number, string, boolean, array, object');
         $mocker = new OpenApiDataMocker();
         $data = $mocker->mockData($dataType, $dataFormat, $options);
@@ -155,7 +156,7 @@ class OpenApiDataMockerTest extends TestCase
         $exclusiveMinimum = false,
         $exclusiveMaximum = false
     ) {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(OpenApiDataMockerException::class);
         $mocker = new OpenApiDataMocker();
         $integer = $mocker->mockInteger($dataFormat, $minimum, $maximum, $exclusiveMinimum, $exclusiveMaximum);
     }
@@ -260,7 +261,7 @@ class OpenApiDataMockerTest extends TestCase
         $exclusiveMinimum = false,
         $exclusiveMaximum = false
     ) {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(OpenApiDataMockerException::class);
         $mocker = new OpenApiDataMocker();
         $number = $mocker->mockNumber($dataFormat, $minimum, $maximum, $exclusiveMinimum, $exclusiveMaximum);
     }
@@ -351,7 +352,7 @@ class OpenApiDataMockerTest extends TestCase
         $maxLength = null,
         $enum = null
     ) {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(OpenApiDataMockerException::class);
         $mocker = new OpenApiDataMocker();
         $str = $mocker->mockString($dataFormat, $minLength, $maxLength, $enum);
     }
@@ -790,7 +791,7 @@ class OpenApiDataMockerTest extends TestCase
         $maxItems,
         $uniqueItems
     ) {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(OpenApiDataMockerException::class);
         $mocker = new OpenApiDataMocker();
         $arr = $mocker->mockArray($items, $minItems, $maxItems, $uniqueItems);
     }
@@ -915,7 +916,7 @@ class OpenApiDataMockerTest extends TestCase
         $additionalProperties,
         $required
     ) {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(OpenApiDataMockerException::class);
         $mocker = new OpenApiDataMocker();
         $obj = $mocker->mockObject($properties, $minProperties, $maxProperties, $additionalProperties, $required);
     }
@@ -1029,7 +1030,7 @@ class OpenApiDataMockerTest extends TestCase
      */
     public function testMockFromSchemaWithInvalidArguments($schema)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(OpenApiDataMockerException::class);
         $mocker = new OpenApiDataMocker();
         $data = $mocker->mockSchemaObject($schema);
     }
@@ -1092,7 +1093,7 @@ class OpenApiDataMockerTest extends TestCase
      */
     public function testMockFromRefWithInvalidArguments($ref)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(OpenApiDataMockerException::class);
         $mocker = new OpenApiDataMocker();
         $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $data = $mocker->mockFromRef($ref);
@@ -1105,7 +1106,7 @@ class OpenApiDataMockerTest extends TestCase
      */
     public function testMockModelFromRefWithInvalidArguments($ref)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(OpenApiDataMockerException::class);
         $mocker = new OpenApiDataMocker();
         $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
         $model = $mocker->mockModelFromRef($ref);

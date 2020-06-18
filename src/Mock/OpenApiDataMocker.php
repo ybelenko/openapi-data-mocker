@@ -17,9 +17,10 @@ namespace OpenAPIServer\Mock;
 use OpenAPIServer\Mock\OpenApiDataMockerInterface as IMocker;
 use OpenAPIServer\Mock\OpenApiModelInterface;
 use OpenAPIServer\Utils\ModelUtilsTrait;
+use OpenAPIServer\Mock\Exceptions\OpenApiDataMockerException;
+use OpenAPIServer\Mock\Exceptions\MockerInvalidArgumentException;
 use StdClass;
 use DateTime;
-use InvalidArgumentException;
 
 /**
  * OpenApiDataMocker
@@ -40,7 +41,7 @@ class OpenApiDataMocker implements IMocker
      * @param string     $dataFormat OpenApi data format.
      * @param array|null $options    OpenApi data options.
      *
-     * @throws \InvalidArgumentException When invalid arguments passed.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When invalid arguments passed.
      *
      * @return mixed
      */
@@ -78,7 +79,7 @@ class OpenApiDataMocker implements IMocker
                 $required = $options['required'] ?? null;
                 return $this->mockObject($properties, $minProperties, $maxProperties, $additionalProperties, $required);
             default:
-                throw new InvalidArgumentException('"dataType" must be one of ' . implode(', ', [
+                throw new MockerInvalidArgumentException('"dataType" must be one of ' . implode(', ', [
                     IMocker::DATA_TYPE_INTEGER,
                     IMocker::DATA_TYPE_NUMBER,
                     IMocker::DATA_TYPE_STRING,
@@ -99,7 +100,7 @@ class OpenApiDataMocker implements IMocker
      * @param bool|null   $exclusiveMinimum Default is false.
      * @param bool|null   $exclusiveMaximum Default is false.
      *
-     * @throws \InvalidArgumentException When $maximum less than $minimum or invalid arguments provided.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When $maximum less than $minimum or invalid arguments provided.
      *
      * @return int
      */
@@ -139,7 +140,7 @@ class OpenApiDataMocker implements IMocker
      * @param bool|null   $exclusiveMinimum Default is false.
      * @param bool|null   $exclusiveMaximum Default is false.
      *
-     * @throws \InvalidArgumentException When $maximum less than $minimum or invalid arguments provided.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When $maximum less than $minimum or invalid arguments provided.
      *
      * @return float
      */
@@ -165,7 +166,7 @@ class OpenApiDataMocker implements IMocker
      * @param string|null $pattern    This string should be a valid regular expression, according to the ECMA 262 regular expression dialect.
      *                                Recall: regular expressions are not implicitly anchored.
      *
-     * @throws \InvalidArgumentException When invalid arguments passed.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When invalid arguments passed.
      *
      * @return string
      */
@@ -202,7 +203,7 @@ class OpenApiDataMocker implements IMocker
                 || empty($enum)
                 || count($enum) > count(array_unique($enum))
             ) {
-                throw new InvalidArgumentException('"enum" must be an array. This array should have at least one element. Elements in the array should be unique.');
+                throw new MockerInvalidArgumentException('"enum" must be an array. This array should have at least one element. Elements in the array should be unique.');
             }
 
             // return random variant
@@ -211,7 +212,7 @@ class OpenApiDataMocker implements IMocker
 
         if ($minLength !== 0 && $minLength !== null) {
             if ($minLength < 0) {
-                throw new InvalidArgumentException('"minLength" must be greater than, or equal to, 0');
+                throw new MockerInvalidArgumentException('"minLength" must be greater than, or equal to, 0');
             }
         } else {
             $minLength = 0;
@@ -219,7 +220,7 @@ class OpenApiDataMocker implements IMocker
 
         if ($maxLength !== null) {
             if ($maxLength < 0) {
-                throw new InvalidArgumentException('"maxLength" must be greater than, or equal to, 0');
+                throw new MockerInvalidArgumentException('"maxLength" must be greater than, or equal to, 0');
             }
         } else {
             // since we don't need huge texts by default, lets cut them down to 100 chars
@@ -227,7 +228,7 @@ class OpenApiDataMocker implements IMocker
         }
 
         if ($maxLength < $minLength) {
-            throw new InvalidArgumentException('"maxLength" value cannot be less than "minLength"');
+            throw new MockerInvalidArgumentException('"maxLength" value cannot be less than "minLength"');
         }
 
         switch ($dataFormat) {
@@ -318,7 +319,7 @@ class OpenApiDataMocker implements IMocker
      * @param int|null  $maxItems    An array instance is valid against "maxItems" if its size is less than, or equal to, the value of this keyword.
      * @param bool|null $uniqueItems If it has boolean value true, the instance validates successfully if all of its elements are unique.
      *
-     * @throws \InvalidArgumentException When invalid arguments passed.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When invalid arguments passed.
      *
      * @return array
      */
@@ -333,22 +334,22 @@ class OpenApiDataMocker implements IMocker
         $maxSize = \PHP_INT_MAX;
 
         if ($items && array_key_exists('type', $items) === false) {
-            new InvalidArgumentException('"items" must assoc array with "type" key');
+            new MockerInvalidArgumentException('"items" must assoc array with "type" key');
         }
 
         if ($minItems !== null) {
             if ($minItems < 0) {
-                throw new InvalidArgumentException('"mitItems" must be an integer greater than, or equal to, 0');
+                throw new MockerInvalidArgumentException('"mitItems" must be an integer greater than, or equal to, 0');
             }
             $minSize = $minItems;
         }
 
         if ($maxItems !== null) {
             if ($maxItems < 0) {
-                throw new InvalidArgumentException('"maxItems" must be an integer greater than, or equal to, 0.');
+                throw new MockerInvalidArgumentException('"maxItems" must be an integer greater than, or equal to, 0.');
             }
             if ($maxItems < $minItems) {
-                throw new InvalidArgumentException('"maxItems" value cannot be less than "minItems"');
+                throw new MockerInvalidArgumentException('"maxItems" value cannot be less than "minItems"');
             }
             $maxSize = $maxItems;
         }
@@ -380,7 +381,7 @@ class OpenApiDataMocker implements IMocker
      * @param array|null             $required             This array MUST have at least one element.  Elements of this array must be strings, and MUST be unique.
      *                                                     An object instance is valid if its property set contains all elements in this array value.
      *
-     * @throws \InvalidArgumentException When invalid arguments passed.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When invalid arguments passed.
      *
      * @return object
      */
@@ -395,38 +396,38 @@ class OpenApiDataMocker implements IMocker
 
         foreach ($properties as $propName => $propValue) {
             if (is_object($propValue) === false && is_array($propValue) === false) {
-                throw new InvalidArgumentException('Each value of "properties" must be an array or object');
+                throw new MockerInvalidArgumentException('Each value of "properties" must be an array or object');
             }
         }
 
         if ($minProperties !== null) {
             if ($minProperties < 0) {
-                throw new InvalidArgumentException('"minProperties" must be integer greater than, or equal to, 0');
+                throw new MockerInvalidArgumentException('"minProperties" must be integer greater than, or equal to, 0');
             }
         }
 
         if ($maxProperties !== null) {
             if ($maxProperties < 0) {
-                throw new InvalidArgumentException('"maxProperties" must be an integer greater than, or equal to, 0.');
+                throw new MockerInvalidArgumentException('"maxProperties" must be an integer greater than, or equal to, 0.');
             }
             if ($maxProperties < $minProperties) {
-                throw new InvalidArgumentException('"maxProperties" value cannot be less than "minProperties"');
+                throw new MockerInvalidArgumentException('"maxProperties" value cannot be less than "minProperties"');
             }
         }
 
         if ($additionalProperties !== null) {
             if (is_bool($additionalProperties) === false && is_object($additionalProperties) === false && is_array($additionalProperties) === false) {
-                throw new InvalidArgumentException('The value of "additionalProperties" must be a boolean or object or array.');
+                throw new MockerInvalidArgumentException('The value of "additionalProperties" must be a boolean or object or array.');
             }
         }
 
         if ($required !== null) {
             if (count($required) > count(array_unique($required))) {
-                throw new InvalidArgumentException('The value of "required" must be an array of unique elements.');
+                throw new MockerInvalidArgumentException('The value of "required" must be an array of unique elements.');
             }
             foreach ($required as $requiredPropName) {
                 if (is_string($requiredPropName) === false) {
-                    throw new InvalidArgumentException('Elements of "required" array must be strings');
+                    throw new MockerInvalidArgumentException('Elements of "required" array must be strings');
                 }
             }
         }
@@ -448,7 +449,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @param array $schema OpenAPI schema.
      *
-     * @throws \InvalidArgumentException When invalid arguments passed.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When invalid arguments passed.
      *
      * @return mixed
      */
@@ -458,7 +459,7 @@ class OpenApiDataMocker implements IMocker
         if (array_key_exists('$ref', $props) && !empty($props['$ref'])) {
             return $this->mockFromRef($props['$ref']);
         } elseif ($props['type'] === null) {
-            throw new InvalidArgumentException('"schema" must be assoc array with "type" property');
+            throw new MockerInvalidArgumentException('"schema" must be assoc array with "type" property');
         }
         return $this->mockData($props['type'], $props['format'], $props);
     }
@@ -468,7 +469,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @param string|null $ref Ref to model, eg. #/components/schemas/User.
      *
-     * @throws \InvalidArgumentException When referenced model not found.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When referenced model not found.
      *
      * @return mixed
      */
@@ -476,7 +477,7 @@ class OpenApiDataMocker implements IMocker
     {
         if ($modelClass = $this->refToModelClass($ref)) {
             if (!method_exists($modelClass, 'getOpenApiSchema')) {
-                throw new InvalidArgumentException(sprintf('Method %s doesn\'t exist', $modelClass . '::getOpenApiSchema'));
+                throw new MockerInvalidArgumentException(sprintf('Method %s doesn\'t exist', $modelClass . '::getOpenApiSchema'));
             }
             return $this->mockSchemaObject($modelClass::getOpenApiSchema());
         }
@@ -489,7 +490,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @param string|null $ref Ref to model, eg. #/components/schemas/User.
      *
-     * @throws \InvalidArgumentException When referenced model not found.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When referenced model not found.
      *
      * @return OpenApiModelInterface
      */
@@ -497,7 +498,7 @@ class OpenApiDataMocker implements IMocker
     {
         if ($modelClass = $this->refToModelClass($ref)) {
             if (in_array(OpenApiModelInterface::class, class_implements($modelClass)) === false) {
-                throw new InvalidArgumentException(sprintf('Class %s doesn\'t implement ' . OpenApiModelInterface::class, $modelClass));
+                throw new MockerInvalidArgumentException(sprintf('Class %s doesn\'t implement ' . OpenApiModelInterface::class, $modelClass));
             }
             $data = $this->mockSchemaObject($modelClass::getOpenApiSchema());
             return $modelClass::createFromData($data);
@@ -511,7 +512,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @param string|null $ref Ref to model, eg. #/components/schemas/User.
      *
-     * @throws \InvalidArgumentException When referenced model not found.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When referenced model not found.
      *
      * @return string|null
      */
@@ -522,7 +523,7 @@ class OpenApiDataMocker implements IMocker
             $modelName = static::toModelName($refName);
             $modelClass = $this->getModelsNamespace() . $modelName;
             if (!class_exists($modelClass)) {
-                throw new InvalidArgumentException(sprintf('Model %s not found', $modelClass));
+                throw new MockerInvalidArgumentException(sprintf('Model %s not found', $modelClass));
             }
             return $modelClass;
         }
@@ -586,7 +587,7 @@ class OpenApiDataMocker implements IMocker
      * @param bool|null  $exclusiveMaximum If maximum exclusive.
      * @param int|null   $maxDecimals      Max decimals.
      *
-     * @throws InvalidArgumentException When invalid arguments passed.
+     * @throws OpenApiDataMockerException|MockerInvalidArgumentException When invalid arguments passed.
      *
      * @return float|int
      *
@@ -604,34 +605,34 @@ class OpenApiDataMocker implements IMocker
 
         if ($minimum !== null) {
             if (is_numeric($minimum) === false) {
-                throw new InvalidArgumentException('"minimum" must be a number');
+                throw new MockerInvalidArgumentException('"minimum" must be a number');
             }
             $min = $minimum;
         }
 
         if ($maximum !== null) {
             if (is_numeric($maximum) === false) {
-                throw new InvalidArgumentException('"maximum" must be a number');
+                throw new MockerInvalidArgumentException('"maximum" must be a number');
             }
             $max = $maximum;
         }
 
         if ($exclusiveMinimum !== false) {
             if ($minimum === null) {
-                throw new InvalidArgumentException('If "exclusiveMinimum" is present, "minimum" must also be present');
+                throw new MockerInvalidArgumentException('If "exclusiveMinimum" is present, "minimum" must also be present');
             }
             $min += 1;
         }
 
         if ($exclusiveMaximum !== false) {
             if ($maximum === null) {
-                throw new InvalidArgumentException('If "exclusiveMaximum" is present, "maximum" must also be present');
+                throw new MockerInvalidArgumentException('If "exclusiveMaximum" is present, "maximum" must also be present');
             }
             $max -= 1;
         }
 
         if ($max < $min) {
-            throw new InvalidArgumentException('"maximum" value cannot be less than "minimum"');
+            throw new MockerInvalidArgumentException('"maximum" value cannot be less than "minimum"');
         }
 
         if ($maxDecimals > 0) {
