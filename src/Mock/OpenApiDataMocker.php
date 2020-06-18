@@ -44,7 +44,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @return mixed
      */
-    public function mock(string $dataType, ?string $dataFormat = null, ?array $options = [])
+    public function mockData(string $dataType, ?string $dataFormat = null, ?array $options = [])
     {
         switch ($dataType) {
             case IMocker::DATA_TYPE_INTEGER:
@@ -362,7 +362,7 @@ class OpenApiDataMocker implements IMocker
         $arrSize = ($maxSize < 1) ? $maxSize : max($minSize, 1);
         while (count($arr) < $arrSize) {
             $data = $this->mockFromRef($ref);
-            $arr[] = ($data) ? $data : $this->mock($dataType, $dataFormat, $options);
+            $arr[] = ($data) ? $data : $this->mockData($dataType, $dataFormat, $options);
         }
         return $arr;
     }
@@ -437,14 +437,14 @@ class OpenApiDataMocker implements IMocker
             $dataFormat = $options['format'] ?? null;
             $ref = $options['$ref'] ?? null;
             $data = $this->mockFromRef($ref);
-            $obj->$propName = ($data) ? $data : $this->mock($dataType, $dataFormat, $options);
+            $obj->$propName = ($data) ? $data : $this->mockData($dataType, $dataFormat, $options);
         }
 
         return $obj;
     }
 
     /**
-     * Mocks OpenApi Data from schema.
+     * Mocks OpenApi Schema Object.
      *
      * @param array $schema OpenAPI schema.
      *
@@ -452,7 +452,7 @@ class OpenApiDataMocker implements IMocker
      *
      * @return mixed
      */
-    public function mockFromSchema(array $schema)
+    public function mockSchemaObject(array $schema)
     {
         $props = $this->extractSchemaProperties($schema);
         if (array_key_exists('$ref', $props) && !empty($props['$ref'])) {
@@ -460,7 +460,7 @@ class OpenApiDataMocker implements IMocker
         } elseif ($props['type'] === null) {
             throw new InvalidArgumentException('"schema" must be assoc array with "type" property');
         }
-        return $this->mock($props['type'], $props['format'], $props);
+        return $this->mockData($props['type'], $props['format'], $props);
     }
 
     /**
@@ -478,7 +478,7 @@ class OpenApiDataMocker implements IMocker
             if (!method_exists($modelClass, 'getOpenApiSchema')) {
                 throw new InvalidArgumentException(sprintf('Method %s doesn\'t exist', $modelClass . '::getOpenApiSchema'));
             }
-            return $this->mockFromSchema($modelClass::getOpenApiSchema());
+            return $this->mockSchemaObject($modelClass::getOpenApiSchema());
         }
 
         return null;
@@ -499,7 +499,7 @@ class OpenApiDataMocker implements IMocker
             if (in_array(OpenApiModelInterface::class, class_implements($modelClass)) === false) {
                 throw new InvalidArgumentException(sprintf('Class %s doesn\'t implement ' . OpenApiModelInterface::class, $modelClass));
             }
-            $data = $this->mockFromSchema($modelClass::getOpenApiSchema());
+            $data = $this->mockSchemaObject($modelClass::getOpenApiSchema());
             return $modelClass::createFromData($data);
         }
 

@@ -29,13 +29,13 @@ use InvalidArgumentException;
 class OpenApiDataMockerTest extends TestCase
 {
     /**
-     * @covers ::mock
+     * @covers ::mockData
      * @dataProvider provideMockCorrectArguments
      */
     public function testMockCorrectArguments($dataType, $dataFormat, $options, $assertMethod)
     {
         $mocker = new OpenApiDataMocker();
-        $data = $mocker->mock($dataType, $dataFormat, $options);
+        $data = $mocker->mockData($dataType, $dataFormat, $options);
         $this->$assertMethod($data);
     }
 
@@ -62,7 +62,7 @@ class OpenApiDataMockerTest extends TestCase
     }
 
     /**
-     * @covers ::mock
+     * @covers ::mockData
      * @dataProvider provideMockInvalidArguments
      */
     public function testMockInvalidArguments($dataType, $dataFormat, $options)
@@ -70,7 +70,7 @@ class OpenApiDataMockerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"dataType" must be one of integer, number, string, boolean, array, object');
         $mocker = new OpenApiDataMocker();
-        $data = $mocker->mock($dataType, $dataFormat, $options);
+        $data = $mocker->mockData($dataType, $dataFormat, $options);
     }
 
     public function provideMockInvalidArguments()
@@ -82,12 +82,12 @@ class OpenApiDataMockerTest extends TestCase
     }
 
     /**
-     * @covers ::mock
+     * @covers ::mockData
      */
     public function testMockWithStringEnumOptions()
     {
         $mocker = new OpenApiDataMocker();
-        $string = $mocker->mock(IMocker::DATA_TYPE_STRING, null, [
+        $string = $mocker->mockData(IMocker::DATA_TYPE_STRING, null, [
             'enum' => ['foobar', 'foobaz', 'helloworld'],
         ]);
         $this->assertContains($string, ['foobar', 'foobaz', 'helloworld']);
@@ -369,7 +369,7 @@ class OpenApiDataMockerTest extends TestCase
     }
 
     /**
-     * @covers ::mock
+     * @covers ::mockData
      * @covers ::mockString
      * @dataProvider provideMockStringByteFormatArguments
      */
@@ -380,7 +380,7 @@ class OpenApiDataMockerTest extends TestCase
     ) {
         $mocker = new OpenApiDataMocker();
         $str = $mocker->mockString($dataFormat, $minLength, $maxLength);
-        $str2 = $mocker->mock(IMocker::DATA_TYPE_STRING, $dataFormat, ['minLength' => $minLength, 'maxLength' => $maxLength]);
+        $str2 = $mocker->mockData(IMocker::DATA_TYPE_STRING, $dataFormat, ['minLength' => $minLength, 'maxLength' => $maxLength]);
         $base64pattern = '/^[\w\+\/\=]*$/';
         if (method_exists($this, 'assertMatchesRegularExpression')) {
             $this->assertMatchesRegularExpression($base64pattern, $str);
@@ -413,7 +413,7 @@ class OpenApiDataMockerTest extends TestCase
     }
 
     /**
-     * @covers ::mock
+     * @covers ::mockData
      * @covers ::mockString
      * @dataProvider provideMockStringDateFormatArguments
      */
@@ -425,7 +425,7 @@ class OpenApiDataMockerTest extends TestCase
     ) {
         $mocker = new OpenApiDataMocker();
         $str = $mocker->mockString($dataFormat, $minLength, $maxLength);
-        $str2 = $mocker->mock(IMocker::DATA_TYPE_STRING, $dataFormat, ['minLength' => $minLength, 'maxLength' => $maxLength]);
+        $str2 = $mocker->mockData(IMocker::DATA_TYPE_STRING, $dataFormat, ['minLength' => $minLength, 'maxLength' => $maxLength]);
 
         if ($dtFormat !== null) {
             $date = DateTime::createFromFormat($dtFormat, $str);
@@ -460,7 +460,7 @@ class OpenApiDataMockerTest extends TestCase
     }
 
     /**
-     * @covers ::mock
+     * @covers ::mockData
      * @covers ::mockString
      * @dataProvider provideMockStringBinaryFormatArguments
      */
@@ -471,7 +471,7 @@ class OpenApiDataMockerTest extends TestCase
     ) {
         $mocker = new OpenApiDataMocker();
         $str = $mocker->mockString($dataFormat, $minLength, $maxLength);
-        $str2 = $mocker->mock(IMocker::DATA_TYPE_STRING, $dataFormat, ['minLength' => $minLength, 'maxLength' => $maxLength]);
+        $str2 = $mocker->mockData(IMocker::DATA_TYPE_STRING, $dataFormat, ['minLength' => $minLength, 'maxLength' => $maxLength]);
         if ($minLength !== null) {
             $this->assertGreaterThanOrEqual($minLength, strlen($str));
             $this->assertGreaterThanOrEqual($minLength, strlen($str2));
@@ -495,7 +495,7 @@ class OpenApiDataMockerTest extends TestCase
     }
 
     /**
-     * @covers ::mock
+     * @covers ::mockData
      * @covers ::mockString
      * @dataProvider provideMockStringUuidFormatArguments
      */
@@ -510,7 +510,7 @@ class OpenApiDataMockerTest extends TestCase
 
         while (count($arr) < 100 && count($arr2) < 100) {
             $str = $mocker->mockString(IMocker::DATA_FORMAT_UUID, $minLength, $maxLength);
-            $str2 = $mocker->mock(IMocker::DATA_TYPE_STRING, IMocker::DATA_FORMAT_UUID, ['minLength' => $minLength, 'maxLength' => $maxLength]);
+            $str2 = $mocker->mockData(IMocker::DATA_TYPE_STRING, IMocker::DATA_FORMAT_UUID, ['minLength' => $minLength, 'maxLength' => $maxLength]);
             $arr[] = $str;
             $arr2[] = $str2;
 
@@ -969,13 +969,13 @@ class OpenApiDataMockerTest extends TestCase
 
     /**
      * @dataProvider provideMockFromSchemaCorrectArguments
-     * @covers ::mockFromSchema
+     * @covers ::mockSchemaObject
      */
     public function testMockFromSchemaWithCorrectArguments($schema, $assertMethod)
     {
         $mocker = new OpenApiDataMocker();
         $mocker->setModelsNamespace('OpenAPIServer\\Mock\\Model\\');
-        $data = $mocker->mockFromSchema($schema);
+        $data = $mocker->mockSchemaObject($schema);
         $this->$assertMethod($data);
     }
 
@@ -1025,13 +1025,13 @@ class OpenApiDataMockerTest extends TestCase
 
     /**
      * @dataProvider provideMockFromSchemaInvalidArguments
-     * @covers ::mockFromSchema
+     * @covers ::mockSchemaObject
      */
     public function testMockFromSchemaWithInvalidArguments($schema)
     {
         $this->expectException(InvalidArgumentException::class);
         $mocker = new OpenApiDataMocker();
-        $data = $mocker->mockFromSchema($schema);
+        $data = $mocker->mockSchemaObject($schema);
     }
 
 

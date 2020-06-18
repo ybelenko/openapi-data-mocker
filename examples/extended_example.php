@@ -36,5 +36,5 @@ echo json_encode($mocker->mockObject($props), \JSON_PRETTY_PRINT);
 
 echo PHP_EOL . PHP_EOL . 'Real world schema' . PHP_EOL ;
 $schema = \OpenAPIServer\Mock\Model\InvoiceTest::getOpenApiSchema();
-$data = $mocker->mockFromSchema($schema);
+$data = $mocker->mockSchemaObject($schema);
 echo json_encode($data, \JSON_PRETTY_PRINT);

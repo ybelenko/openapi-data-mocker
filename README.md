@@ -104,9 +104,9 @@ properties:
     type: string
     format: date-time
 ```
-> Notice! While schema object presented in YAML format this library doesn't support YAML or JSON parsing right now. It means that `mockFromSchema` method expects already decoded JSON value as argument.
+> Notice! While schema object presented in YAML format this library doesn't support YAML or JSON parsing right now. It means that `mockSchemaObject` method expects already decoded JSON value as argument.
 
-When we mock mentioned schema with `mockFromSchema` method:
+When we mock mentioned schema with `mockSchemaObject` method:
 ```php
 require __DIR__ . '/vendor/autoload.php';
 
@@ -118,7 +118,7 @@ $mocker->setModelsNamespace('JohnDoesPackage\\Model\\');
 // class InvoiceTest contains schema mentioned previously
 // it returns that schema with getOpenApiSchema() method declared in OpenAPIServer\Mock\BaseModel parent class
 $schema = \OpenAPIServer\Mock\Model\InvoiceTest::getOpenApiSchema();
-$data = $mocker->mockFromSchema($schema);
+$data = $mocker->mockSchemaObject($schema);
 echo json_encode($data, \JSON_PRETTY_PRINT);
 ```
 
