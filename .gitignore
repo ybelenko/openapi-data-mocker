@@ -10,3 +10,6 @@ composer.lock
 # Test coverage reports
 /report/*
 !/report/.gitkeep
+
+# PHPUnit cache
+.phpunit.result.cache
