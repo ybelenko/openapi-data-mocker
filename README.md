@@ -10,6 +10,8 @@ Openapi Data Mocker helps to generate fake data from OpenAPI 3.0 documents. Most
 ## Requirements
 - PHP ^7.3
 
+__Important notice! While PHP 8.0 declared in composer.json this package hasn't been tested against it.__
+
 ## Installation via Composer
 
 Run in terminal:

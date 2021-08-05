@@ -12,7 +12,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": "^7.2",
+        "php": "^7.3 || ^8.0",
         "ybelenko/openapi-data-mocker-interfaces": "^1.0"
     },
     "require-dev": {
