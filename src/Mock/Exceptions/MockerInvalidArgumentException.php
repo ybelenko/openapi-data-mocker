@@ -21,5 +21,4 @@ use OpenAPIServer\Mock\Exceptions\OpenApiDataMockerException;
  */
 class MockerInvalidArgumentException extends OpenApiDataMockerException
 {
-
 }
