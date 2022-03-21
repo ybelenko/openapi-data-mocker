@@ -1,7 +1,7 @@
 # Openapi Data Mocker
 
 [![Latest Stable Version](https://poser.pugx.org/ybelenko/openapi-data-mocker/v/stable)](https://packagist.org/packages/ybelenko/openapi-data-mocker)
-[![Build Status](https://travis-ci.com/ybelenko/openapi-data-mocker.svg?branch=master)](https://travis-ci.com/ybelenko/openapi-data-mocker)
+[![Build Status](https://github.com/ybelenko/openapi-data-mocker/actions/workflows/ci.yml/badge.svg)](https://github.com/ybelenko/openapi-data-mocker/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/ybelenko/openapi-data-mocker/badge.svg?branch=master)](https://coveralls.io/github/ybelenko/openapi-data-mocker?branch=master)
 [![License](https://poser.pugx.org/ybelenko/openapi-data-mocker/license)](https://packagist.org/packages/ybelenko/openapi-data-mocker)
 
